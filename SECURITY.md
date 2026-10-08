@@ -1,9 +1,11 @@
-# Security policy
+# Security
 
-This is beta software. Do not treat a successful scan as proof of zero vulnerabilities. The renderer is a separate bounded process, not a full OS sandbox.
+Report suspected vulnerabilities through GitHub private vulnerability reporting when available. Do not publish exploit details, credentials or private sample files in an issue.
 
-For security issues, use the repository's private vulnerability reporting feature if available. Do not post exploit details or private files in public issues. Supported fixes target the latest beta version.
+There is currently no approved 1.0 release. A Windows shell stability report is under investigation; release checks are tracked in [docs/verification.md](docs/verification.md).
 
-No telemetry, input uploads or network rendering are implemented. Version 0.5 adds an HTTPS request to the public GitHub releases API for update checks; it sends no preview files or account credentials. Response size and time are bounded, and download links are restricted to this repository on github.com. The optional installer finish action and settings link open the public GitHub repository in your browser.
+Native decoders handle complex, untrusted file formats. A separate process and input/time limits reduce impact, but do not provide a complete operating-system sandbox. Keep Windows and the .NET Desktop Runtime updated. A clean advisory scan does not establish that a build has no vulnerabilities.
 
-Native decoders and the installed .NET runtime must be kept current. See docs/SECURITY-CHECKS.md for checks performed on this release and their limits.
+Preview files stay local. Update checks send only ordinary HTTPS requests for public GitHub release metadata. The optional per-file PDF permission action removes a download mark only after explicit confirmation; it does not change global Windows security policy.
+
+Dependency license and copyright texts are retained in `NOTICE.txt`. No credentials, personal documents or machine images belong in this repository.

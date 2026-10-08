@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>WinExe</OutputType><AssemblyName>Whatsinthebox</AssemblyName><ApplicationIcon>app.ico</ApplicationIcon><PublishSingleFile>true</PublishSingleFile><IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract><EnableCompressionInSingleFile>true</EnableCompressionInSingleFile></PropertyGroup>
+ <ItemGroup>
+  <PackageReference Include="PDFtoImage" Version="5.4.0" />
+  <ProjectReference Include="../UI/UI.csproj" />
+  <ProjectReference Include="../Shell/Shell.csproj" AdditionalProperties="SelfContained=false;PublishSingleFile=false" />
+  <PackageReference Include="Magick.NET-Q8-x64" Version="14.16.0" />
+  <PackageReference Include="Svg.Skia" Version="5.2.3" />
+  <Content Include="policy.xml" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  <Content Include="Fonts/*.ttf" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  <Content Include="author.png" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  <Content Include="logo.png" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+ </ItemGroup>
+</Project>

@@ -1,1 +1,1 @@
-<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><AssemblyName>Whatsinthebox.Tests</AssemblyName></PropertyGroup><ItemGroup><ProjectReference Include="../Shell/Shell.csproj"/></ItemGroup></Project>
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><AssemblyName>Whatsinthebox.Tests</AssemblyName></PropertyGroup><ItemGroup><Compile Remove="Core/**/*.cs"/><ProjectReference Include="../src/Shell/Shell.csproj"/></ItemGroup></Project>

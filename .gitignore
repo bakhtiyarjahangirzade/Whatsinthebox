@@ -7,3 +7,9 @@ dist/
 *.user
 test-capture.flag
 setup-error.txt
+artifacts/
+node_modules/
+.vercel/
+premium-audit.json
+**/*.log
+test-results.json
