@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+release*/
+tests-bin/
+dist/
+*.pdb
+*.user
+test-capture.flag
+setup-error.txt

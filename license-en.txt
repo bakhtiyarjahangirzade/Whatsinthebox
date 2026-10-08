@@ -1,0 +1,1 @@
+﻿Whatsinthebox is free and open source under the MIT License. The original license and dependency notices are included with the installation. Files stay on your computer. No account, payment or subscription is required.

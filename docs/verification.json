@@ -1,0 +1,598 @@
+{
+  "renderer": {
+    "failed": 0,
+    "results": [
+      {
+        "name": "png",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "jpg",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "bmp",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "gif",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "tiff",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "svg",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Bağımsız SVG. Dış ve etkin içerikler engellenir.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "SVG • Vektör önizleme",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "svg external blocked",
+        "passed": true,
+        "info": {
+          "Success": false,
+          "Message": "SVG etkin ve dış içerikleri engellenir. Yalnızca bağımsız, sabit vektörler önizlenir.",
+          "Width": 0,
+          "Height": 0,
+          "Mode": "",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "svg DTD blocked",
+        "passed": true,
+        "info": {
+          "Success": false,
+          "Message": "Dosya bozuk, şifreli, desteklenmeyen bir sürüm veya kayıtlı önizlemesi eksik olabilir.",
+          "Width": 0,
+          "Height": 0,
+          "Mode": "",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "SVG safe style block",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Bağımsız SVG. Dış ve etkin içerikler engellenir.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "SVG • Vektör önizleme",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "SVG CSS import blocked",
+        "passed": true,
+        "info": {
+          "Success": false,
+          "Message": "SVG etkin ve dış içerikleri engellenir. Yalnızca bağımsız, sabit vektörler önizlenir.",
+          "Width": 0,
+          "Height": 0,
+          "Mode": "",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "CDR embedded preview fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Gömülü önizleme; tam vektör çözümlemesi değil.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "CDR • Gömülü görüntü",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "CDR missing preview",
+        "passed": true,
+        "info": {
+          "Success": false,
+          "Message": "Bu CDR dosyasında okunabilir gömülü önizleme yok. Eski ikili CDR desteklenmiyor.",
+          "Width": 0,
+          "Height": 0,
+          "Mode": "",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "malformed file",
+        "passed": true,
+        "info": {
+          "Success": false,
+          "Message": "Dosya bozuk, şifreli, desteklenmeyen bir sürüm veya kayıtlı önizlemesi eksik olabilir.",
+          "Width": 0,
+          "Height": 0,
+          "Mode": "",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "PSD composite",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaydedilmiş birleşik görüntü. Katmanlar düzenlenmez.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "PSD birleşik görüntü",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "WebP",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .ico",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .cur",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .tga",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .dds",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .avif",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .jp2",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .j2k",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .jxl",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .exr",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .hdr",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .pcx",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .qoi",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .ppm",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .pgm",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .pbm",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .pnm",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .psb",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaydedilmiş birleşik görüntü. Katmanlar düzenlenmez.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "PSD birleşik görüntü",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "extended .mng",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaynak dosya değiştirilmedi.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "Görsel • ilk kare/sayfa",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "text pages",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 2 / 3. Metin görünümü; özgün düzen korunmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "Metin / kod",
+          "PageCount": 3
+        }
+      },
+      {
+        "name": "DOCX text fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 1 / 1. Metin görünümü; özgün düzen korunmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "DOCX • Metin önizlemesi",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "XLSX values fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "İlk 45 satır / 8 sütun. Kaydedilmiş değerler; formüller çalıştırılmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "XLSX • Hücre değerleri",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "PPTX slide navigation fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Yalnızca slayt metni; düzen ve görseller korunmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "PPTX • Metin önizlemesi",
+          "PageCount": 2
+        }
+      },
+      {
+        "name": "ODF text fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 1 / 1. Metin görünümü; özgün düzen korunmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "OpenDocument • Metin önizlemesi",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "ORA/KRA merged image fixture",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Kaydedilmiş birleşik görüntü; katmanlar düzenlenmez.",
+          "Width": 160,
+          "Height": 90,
+          "Mode": "ORA/KRA • Gömülü görüntü",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "ZIP listing",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 1 / 1. Metin görünümü; özgün düzen korunmaz.",
+          "Width": 1200,
+          "Height": 1500,
+          "Mode": "ZIP / CBZ • Dosya listesi",
+          "PageCount": 1
+        }
+      },
+      {
+        "name": "PDF first page",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 1 / 2. Belge değiştirilmez.",
+          "Width": 1545,
+          "Height": 2000,
+          "Mode": "PDF",
+          "PageCount": 2
+        }
+      },
+      {
+        "name": "PDF second page",
+        "passed": true,
+        "info": {
+          "Success": true,
+          "Message": "Sayfa 2 / 2. Belge değiştirilmez.",
+          "Width": 1545,
+          "Height": 2000,
+          "Mode": "PDF",
+          "PageCount": 2
+        }
+      },
+      {
+        "name": "aspect ratio (1600, 900)",
+        "passed": true
+      },
+      {
+        "name": "aspect ratio (900, 1600)",
+        "passed": true
+      },
+      {
+        "name": "aspect ratio (1000, 1000)",
+        "passed": true
+      },
+      {
+        "name": "aspect ratio (12000, 100)",
+        "passed": true
+      },
+      {
+        "name": "PDF source aspect ratio",
+        "passed": true
+      },
+      {
+        "name": "complete locale en",
+        "passed": true
+      },
+      {
+        "name": "complete locale ru",
+        "passed": true
+      },
+      {
+        "name": "complete locale de",
+        "passed": true
+      },
+      {
+        "name": "complete locale zh",
+        "passed": true
+      },
+      {
+        "name": "complete locale tr",
+        "passed": true
+      },
+      {
+        "name": "shared UI render",
+        "passed": true
+      }
+    ]
+  },
+  "nativeCOM": {
+    "failed": 0,
+    "results": [
+      {
+        "name": "native COM activation and interface negotiation",
+        "passed": true
+      },
+      {
+        "name": "COM file initialization and rendering",
+        "passed": true
+      },
+      {
+        "name": "COM stream initialization and rendering",
+        "passed": true
+      },
+      {
+        "name": "unload and resize",
+        "passed": true
+      }
+    ]
+  },
+  "windowsShell": {
+    "failed": 0,
+    "results": [
+      {
+        "name": "Windows out-of-process PDF thumbnail",
+        "passed": true,
+        "width": 198,
+        "height": 256,
+        "alpha": 1
+      },
+      {
+        "name": "Windows Shell PDF thumbnail lookup",
+        "passed": true,
+        "hresult": "0x00000000"
+      },
+      {
+        "name": "Windows out-of-process PDF preview renders",
+        "passed": true,
+        "evidence": "server-owned capture after real out-of-process activation"
+      }
+    ]
+  }
+}

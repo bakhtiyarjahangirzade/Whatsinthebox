@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PDFtoImage</id>
+    <version>5.4.0</version>
+    <authors>David Sungaila</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon_128.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/sungaila/PDFtoImage</projectUrl>
+    <description>A .NET library to render PDF files into images.</description>
+    <releaseNotes>- Improved support for linearized and problematic PDFs using PDFium’s Availability API.
+- Added lazy page-size loading so inaccessible pages no longer block unrelated pages.
+- Relaxed the 4 GiB stream limit on supported 64-bit Unix platforms.</releaseNotes>
+    <tags>PDF Bitmap Image Convert Conversion C# PDFium SkiaSharp Skia PNG JPG JPEG WEBP Xamarin Android iOS MacCatalyst Catalyst MAUI wasm WebAssembly</tags>
+    <repository type="git" url="https://github.com/sungaila/PDFtoImage.git" commit="5948628cb2cf7d070c7fd28b1b4496db39e3afcd" />
+    <dependencies>
+      <group targetFramework="net10.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net10.0-android36.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Android" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Android" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net10.0-browser1.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.WebAssembly" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="Sungaila.PDFium.BlazorWebAssembly" version="152.0.7961.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net10.0-ios26.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.iOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.iOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net10.0-maccatalyst26.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.MacCatalyst" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.iOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework=".NETFramework4.7.1">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework=".NETFramework4.8.1">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework="net9.0-browser1.0">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.WebAssembly" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="Sungaila.PDFium.BlazorWebAssembly" version="152.0.7961.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="SkiaSharp" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Linux.NoDependencies" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.Win32" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="SkiaSharp.NativeAssets.macOS" version="4.150.1" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Linux" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.Win32" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+        <dependency id="bblanchon.PDFium.macOS" version="152.0.7961" include="Runtime,Compile,Build,Native,ContentFiles,BuildTransitive" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

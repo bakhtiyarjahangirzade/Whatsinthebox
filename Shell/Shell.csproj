@@ -1,0 +1,1 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><EnableComHosting>true</EnableComHosting><EnableDynamicLoading>true</EnableDynamicLoading><AssemblyName>Whatsinthebox.Shell</AssemblyName></PropertyGroup><ItemGroup><ProjectReference Include="../UI/UI.csproj"/></ItemGroup></Project>

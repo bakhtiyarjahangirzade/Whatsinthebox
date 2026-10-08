@@ -1,0 +1,8 @@
+<policymap>
+  <policy domain="delegate" rights="none" pattern="*" />
+  <policy domain="coder" rights="none" pattern="{URL,HTTP,HTTPS,FTP,MSL,MVG,SVG,SVGZ,PS,PS2,PS3,EPS,PDF,PANGO,TEXT,LABEL,VID,HTML}" />
+  <policy domain="path" rights="none" pattern="@*" />
+  <policy domain="resource" name="memory" value="256MiB" />
+  <policy domain="resource" name="map" value="256MiB" />
+  <policy domain="resource" name="disk" value="0" />
+</policymap>
