@@ -6,7 +6,7 @@
  <a href="docs/verification.md"><img src="https://img.shields.io/badge/1.0-release_verification-c18a39?style=flat-square" alt="1.0 release verification"></a>
 </p>
 <p align="center"><strong>Local file previews, right where your files live.</strong><br>PDFs, artwork, images and fonts. Free and open source.</p>
-<p align="center"><a href="#how-it-works">How it works</a> · <a href="#file-support">File support</a> · <a href="docs/verification.md">Release checks</a> · <a href="CONTRIBUTING.md">Build from source</a></p>
+<p align="center"><a href="https://whatsinthebox-alpha.vercel.app">Website</a> · <a href="#how-it-works">How it works</a> · <a href="#file-support">File support</a> · <a href="docs/verification.md">Release checks</a> · <a href="CONTRIBUTING.md">Build from source</a></p>
 
 ## Release status
 
