@@ -27,7 +27,7 @@ No separate file workspace, account, subscription, ads or telemetry. The app che
 
 The welcome and completion pages use the full-height author portrait.
 
-![Installer completion](docs/screenshots/setup-finish.png)
+![Installer completion](docs/screenshots/setup-finish.jpg)
 
 <img src="docs/screenshots/settings-en.png" width="620" alt="Actual settings form control capture" />
 
