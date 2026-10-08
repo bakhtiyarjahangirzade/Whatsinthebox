@@ -19,7 +19,7 @@ static class Installer
         if(!Directory.Exists(runtime)||!Directory.EnumerateDirectories(runtime).Any(p=>Path.GetFileName(p).StartsWith("10.")))throw new IOException(L.T("runtime.required"));
         var source=AppContext.BaseDirectory;
         if(!File.Exists(Path.Combine(source,"shell","Whatsinthebox.Shell.comhost.dll")))throw new IOException(L.T("extension.missing"));
-        Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app","0.4");Directory.CreateDirectory(bin);
+        Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app","0.5");Directory.CreateDirectory(bin);
         if(!Path.GetFullPath(source).TrimEnd('\\').Equals(Path.GetFullPath(bin).TrimEnd('\\'),StringComparison.OrdinalIgnoreCase))foreach(var file in Directory.EnumerateFiles(source,"*",SearchOption.AllDirectories)){var target=Path.Combine(bin,Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
         var targets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
         foreach(var ext in SupportedFiles.All)AddTargets(ext,IntegrationIds.PreviewInterface,IntegrationIds.Preview);

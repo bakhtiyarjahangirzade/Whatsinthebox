@@ -9,3 +9,5 @@ Rounded controls with visible keyboard focus. The preview toolbar wraps in narro
 English, Russian, German, Chinese and Turkish catalogs have identical keys. Installer language is persisted. Language choices remain in their native names. Application-owned dialog buttons use the selected catalog; OS/runtime consent dialogs use their own system language.
 
 Setup completion shows an author portrait and an optional initially checked repository link. Silent install opens no browser. Repair, uninstall and repository are maintenance actions; rendering stays in Explorer.
+
+Version 0.5: shared primary ink #182336; borderless compact maintenance window with rounded white surfaces, no oversized status table. The website uses the blue paper-and-box composition, one download action, and matching Inter type. Finish-page portrait owns the left rail; Inno controls retain the right rail. Update states reserve their geometry and never block previews.

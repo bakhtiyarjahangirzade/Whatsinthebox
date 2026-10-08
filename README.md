@@ -1,21 +1,18 @@
-<div align="center">
-<img src="App/logo.png" width="128" alt="Whatsinthebox icon" />
+![Whatsinthebox banner](docs/banner.svg)
 
 # Whatsinthebox
-**See what’s inside. Right in Windows.**
 
-Free, open-source file previews and thumbnails for Windows 10/11 x64.
+Free Windows file previews. See inside. Stay in Explorer.
 
-[Download v0.4 beta](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.4.0) · [Report a problem](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/issues) · [Security](SECURITY.md)
+**[Download for Windows](https://whatsinthebox.bakhtiyarajpl.chatgpt.site)** · [Releases](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.5.0) · [Security checks](docs/SECURITY-CHECKS.md)
 
 English · Русский · Deutsch · 简体中文 · Türkçe
-</div>
 
 ## A Windows feature, with almost nothing to manage
 
 Select a file in File Explorer. Use **Alt+P** for a full preview, or see its thumbnail in Details and folder views. Images keep their original proportions; transparent artwork can use a checkerboard, light or dark background. PDFs have page navigation.
 
-No separate file workspace, account, subscription, ads or telemetry. A windowless helper starts when you sign in. The only app window is a small maintenance panel for language, repair and removal.
+No separate file workspace, account, subscription, ads or telemetry. The app checks the public GitHub release list when online, caches automatic checks for 24 hours, and offers a manual check. Updates are downloaded only when you choose to open the release link; nothing installs automatically. A windowless helper starts when you sign in. The only app window is a small maintenance panel for language, repair and removal.
 
 <img src="docs/screenshots/windows-preview.png" width="430" alt="Actual native PDF preview integration test capture" />
 
@@ -23,7 +20,7 @@ No separate file workspace, account, subscription, ads or telemetry. A windowles
 
 ## Install in your language
 
-1. Download **Whatsinthebox-0.4.0-Setup.exe** from Releases.
+1. Download **Whatsinthebox-0.5.0-Setup.exe** from Releases.
 2. Choose English, Russian, German, Simplified Chinese or Turkish. Setup saves that choice for the feature.
 3. Keep Windows integration enabled, then reopen Explorer and press **Alt+P**.
 4. The finish page includes an optional, initially checked GitHub repository link. Uncheck it to finish without opening a browser.
@@ -69,7 +66,7 @@ ImageMagick delegates and remote/active coders are disabled. Office XML uses bou
 Windows x64, .NET 10 SDK:
 
     ./build.ps1
-    ./release-v4/Whatsinthebox.exe --self-test results.json
+    ./release-v5/Whatsinthebox.exe --self-test results.json
     dotnet list App/App.csproj package --vulnerable --include-transitive
 
 To build the installer, place the official Microsoft .NET 10 Desktop Runtime x64 installer at ../tools/windowsdesktop-runtime-x64.exe and verify its Microsoft signature. Compile Setup.iss with Inno Setup 6.7.3, for example ISCC /Odist Setup.iss. Check Inno Setup’s current distribution/commercial license terms before commercial use. The project source is MIT; third-party licenses are included separately.

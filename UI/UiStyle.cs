@@ -13,10 +13,19 @@ public static class UiStyle
 }
 public sealed class RoundedButton:Button
 {
+ public RoundedButton(){Cursor=Cursors.Hand;FlatStyle=FlatStyle.Flat;}
+ bool hover;
+ protected override void OnMouseEnter(EventArgs e){hover=true;Invalidate();base.OnMouseEnter(e);}
+ protected override void OnMouseLeave(EventArgs e){hover=false;Invalidate();base.OnMouseLeave(e);}
  protected override void OnPaint(PaintEventArgs e)
  {
-  e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;var r=new RectangleF(1,1,Width-3,Height-3);using var path=new GraphicsPath();const float d=14;path.AddArc(r.X,r.Y,d,d,180,90);path.AddArc(r.Right-d,r.Y,d,d,270,90);path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(r.X,r.Bottom-d,d,d,90,90);path.CloseFigure();using var fill=new SolidBrush(Enabled?BackColor:Theme.Canvas);e.Graphics.FillPath(fill,path);using var pen=new Pen(Focused?Theme.Primary:Color.FromArgb(210,210,215));e.Graphics.DrawPath(pen,path);TextRenderer.DrawText(e.Graphics,Text,Font,ClientRectangle,Enabled?ForeColor:Theme.Muted,TextFormatFlags.HorizontalCenter|TextFormatFlags.VerticalCenter|TextFormatFlags.NoPrefix);
+  e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;var r=new RectangleF(1,1,Width-3,Height-3);using var path=new GraphicsPath();const float d=18;path.AddArc(r.X,r.Y,d,d,180,90);path.AddArc(r.Right-d,r.Y,d,d,270,90);path.AddArc(r.Right-d,r.Bottom-d,d,d,0,90);path.AddArc(r.X,r.Bottom-d,d,d,90,90);path.CloseFigure();using var fill=new SolidBrush(!Enabled?Theme.Canvas:hover?ControlPaint.Light(BackColor,.15f):BackColor);e.Graphics.FillPath(fill,path);using var pen=new Pen(Focused?Color.FromArgb(0,122,255):Color.FromArgb(218,226,235),Focused?2:1);e.Graphics.DrawPath(pen,path);TextRenderer.DrawText(e.Graphics,Text,Font,ClientRectangle,Enabled?ForeColor:Theme.Muted,TextFormatFlags.HorizontalCenter|TextFormatFlags.VerticalCenter|TextFormatFlags.NoPrefix);
  }
+}
+public sealed class SurfacePanel:Panel
+{
+ public SurfacePanel(){BackColor=Color.White;DoubleBuffered=true;}
+ protected override void OnPaintBackground(PaintEventArgs e){e.Graphics.Clear(Theme.Canvas);e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;using var p=new GraphicsPath();float d=24;p.AddArc(0,0,d,d,180,90);p.AddArc(Width-d-1,0,d,d,270,90);p.AddArc(Width-d-1,Height-d-1,d,d,0,90);p.AddArc(0,Height-d-1,d,d,90,90);p.CloseFigure();using var b=new SolidBrush(Color.White);e.Graphics.FillPath(b,p);using var border=new Pen(Color.FromArgb(228,234,241));e.Graphics.DrawPath(border,p);}
 }
 public sealed class LocalePicker:ComboBox
 {

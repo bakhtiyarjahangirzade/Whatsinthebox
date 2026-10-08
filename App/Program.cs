@@ -8,6 +8,7 @@ static class Program
     {
         if(args.Length==2&&args[0]=="--set-language"){L.Set(args[1]);return 0;}
         int locale=Array.IndexOf(args,"--locale");if(locale>=0&&locale+1<args.Length&&L.Languages.Contains(args[locale+1]))L.Override=args[locale+1];
+        if(args.Length==2&&args[0]=="--check-updates"){File.WriteAllText(args[1],System.Text.Json.JsonSerializer.Serialize(Updates.CheckAsync(true).GetAwaiter().GetResult()));return 0;}
         if(args.Length>=4&&args[0]=="--render")return Renderer.Run(args[1],args[2],args[3],args.Length>4?int.Parse(args[4]):0);
         if(args.Length>0&&args[0]=="--register"){try{Installer.Install(true);return 0;}catch(Exception ex){File.WriteAllText(Path.Combine(AppContext.BaseDirectory,"setup-error.txt"),ex.Message);return 1;}}
         if(args.Length>0&&args[0]=="--unregister"){try{Installer.Uninstall();return 0;}catch{return 1;}}

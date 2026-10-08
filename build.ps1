@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
-dotnet publish App/App.csproj -c Release --self-contained true -o release-v4
+dotnet publish App/App.csproj -c Release --self-contained true -m:1 -o release-v5
 if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
-dotnet publish Shell/Shell.csproj -c Release --self-contained false -o release-v4/shell
+dotnet publish Shell/Shell.csproj -c Release --self-contained false -m:1 -o release-v5/shell
 if ($LASTEXITCODE -ne 0) { throw 'Shell build failed' }
-Copy-Item licenses release-v4/licenses -Recurse -Force
-Copy-Item LICENSE,THIRD-PARTY.md release-v4/ -Force
-Write-Output 'Ready: release-v4/Whatsinthebox.exe. See README for installer compilation.'
+Copy-Item licenses release-v5/licenses -Recurse -Force
+Copy-Item LICENSE,THIRD-PARTY.md release-v5/ -Force
+Write-Output 'Ready: release-v5/Whatsinthebox.exe. See README for installer compilation.'

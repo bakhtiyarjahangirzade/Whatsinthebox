@@ -22,3 +22,9 @@ The renderer is a separate process with bounded preview timeout, not an OS sandb
 The screenshots are actual application/native preview control captures using synthetic or project-owned fixtures. They are not fabricated Explorer mockups. Live Explorer UI capture and comprehensive testing across different PCs were not performed. Automated checks are fixtures, not guarantees of compatibility with every real file. The first public version remains a beta.
 
 See verification.json for the individual automated results. Setup/uninstall lifecycle was also checked locally; a concise result is included in installer-lifecycle.json. Raw registry backups and local installer logs are intentionally excluded.
+
+
+## 0.5 checks
+55 renderer/UI/localization/update-selection checks passed. Newer published beta releases are supported; foreign download URLs are rejected. Five installer completion-page assertions passed: author portrait is visible, the original wizard image is hidden, and portrait bounds do not overlap the run list. The website resolver selects an uploaded setup asset, rejects foreign links, and retains a direct download fallback when API access fails.
+
+Update checks use the public GitHub HTTPS API. No file contents are sent; API requests include a product/version User-Agent. Automatic results are cached for 24 hours; manual checks bypass the cache. No update is executed or installed automatically.

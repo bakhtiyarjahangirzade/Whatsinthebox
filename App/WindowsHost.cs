@@ -44,7 +44,9 @@ static class WindowsHost
     try{Marshal.ThrowExceptionForHR(CoRegisterClassObject(in id,unknown,4,5,out uint cookie));cookies.Add(cookie);}finally{Marshal.Release(unknown);}
    }
    Marshal.ThrowExceptionForHR(CoResumeClassObjects());
-   using var context=new ApplicationContext();using var timer=new System.Windows.Forms.Timer{Interval=500};timer.Tick+=(_,_)=>{if(stop.WaitOne(0))context.ExitThread();};timer.Start();Application.Run(context);return 0;
+   _=Updates.CheckAsync();
+   var nextUpdate=DateTime.UtcNow.AddHours(24);
+   using var context=new ApplicationContext();using var timer=new System.Windows.Forms.Timer{Interval=500};timer.Tick+=(_,_)=>{if(stop.WaitOne(0))context.ExitThread();if(DateTime.UtcNow>=nextUpdate){nextUpdate=DateTime.UtcNow.AddHours(24);_=Updates.CheckAsync();}};timer.Start();Application.Run(context);return 0;
   }
   finally{foreach(uint cookie in cookies)CoRevokeClassObject(cookie);HostDispatcher.Anchor=null;GC.KeepAlive(factories);}
  }

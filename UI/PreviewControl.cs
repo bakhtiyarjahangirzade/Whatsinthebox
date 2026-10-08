@@ -6,7 +6,7 @@ namespace Whatsinthebox.UI;
 
 public static class Theme
 {
-    public static readonly Color Canvas = ColorTranslator.FromHtml("#F5F5F7"), Surface = ColorTranslator.FromHtml("#FFFFFF"), Text = ColorTranslator.FromHtml("#1D1D1F"), Muted = ColorTranslator.FromHtml("#6E6E73"), Primary = ColorTranslator.FromHtml("#007AFF");
+    public static readonly Color Canvas = ColorTranslator.FromHtml("#F5F5F7"), Surface = ColorTranslator.FromHtml("#FFFFFF"), Text = ColorTranslator.FromHtml("#1D1D1F"), Muted = ColorTranslator.FromHtml("#6E6E73"), Primary = ColorTranslator.FromHtml("#182336");
 }
 public sealed record RenderInfo(bool Success, string Message, int Width=0, int Height=0, string Mode="",int PageCount=1);
 
@@ -124,3 +124,4 @@ public sealed class ImageCanvas : Control
     }
     protected override void Dispose(bool disposing){if(disposing)image?.Dispose();base.Dispose(disposing);}
 }
+

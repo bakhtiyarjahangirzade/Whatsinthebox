@@ -93,7 +93,16 @@
     "setup.runtime.failed": "The Microsoft runtime could not be installed. Retry or deselect Windows integration.",
     "setup.registration.failed": "The feature was installed, but Windows integration needs repair. Open settings to repair it.",
     "setup.uninstall.failed": "Previous preview handlers could not be restored. Uninstall stopped before deleting files.",
-    "setup.license": "Whatsinthebox is free and open source under the MIT License. The original license and dependency notices are included with the installation. Files stay on your computer. No account, payment or subscription is required."
+    "setup.license": "Whatsinthebox is free and open source under the MIT License. The original license and dependency notices are included with the installation. Files stay on your computer. No account, payment or subscription is required.",
+    "ready.short": "Ready in File Explorer",
+    "updates.title": "Updates",
+    "updates.check": "Check now",
+    "updates.checking": "Checking GitHub…",
+    "updates.current": "You have the latest version.",
+    "updates.available": "Version {0} is ready to download.",
+    "updates.offline": "No connection. Try again when online.",
+    "updates.error": "Could not check. Try again later.",
+    "updates.download": "Download update"
   },
   "ru": {
     "settings.title": "Предпросмотр Windows",
@@ -189,7 +198,16 @@
     "setup.runtime.failed": "Не удалось установить компонент Microsoft. Повторите попытку или отключите интеграцию Windows.",
     "setup.registration.failed": "Компонент установлен, но интеграцию нужно восстановить. Откройте настройки.",
     "setup.uninstall.failed": "Прежние обработчики не восстановлены. Удаление остановлено до удаления файлов.",
-    "setup.license": "Whatsinthebox бесплатен и имеет открытый код по лицензии MIT. Оригинал лицензии и уведомления зависимостей входят в установку. Файлы остаются на компьютере. Учётная запись, оплата и подписка не нужны."
+    "setup.license": "Whatsinthebox бесплатен и имеет открытый код по лицензии MIT. Оригинал лицензии и уведомления зависимостей входят в установку. Файлы остаются на компьютере. Учётная запись, оплата и подписка не нужны.",
+    "ready.short": "Готово в Проводнике",
+    "updates.title": "Обновления",
+    "updates.check": "Проверить",
+    "updates.checking": "Проверка GitHub…",
+    "updates.current": "Установлена последняя версия.",
+    "updates.available": "Версия {0} доступна для загрузки.",
+    "updates.offline": "Нет соединения. Повторите позже.",
+    "updates.error": "Не удалось проверить. Повторите позже.",
+    "updates.download": "Скачать обновление"
   },
   "de": {
     "settings.title": "Windows-Vorschau",
@@ -285,7 +303,16 @@
     "setup.runtime.failed": "Microsoft-Laufzeit konnte nicht installiert werden. Erneut versuchen oder Windows-Integration abwählen.",
     "setup.registration.failed": "Funktion installiert, Windows-Integration muss jedoch repariert werden. Einstellungen öffnen.",
     "setup.uninstall.failed": "Bisherige Vorschau-Handler konnten nicht wiederhergestellt werden. Deinstallation vor dem Löschen gestoppt.",
-    "setup.license": "Whatsinthebox ist kostenlos und quelloffen unter der MIT-Lizenz. Originallizenz und Hinweise zu Abhängigkeiten sind enthalten. Dateien bleiben auf Ihrem Computer. Kein Konto, keine Zahlung und kein Abonnement erforderlich."
+    "setup.license": "Whatsinthebox ist kostenlos und quelloffen unter der MIT-Lizenz. Originallizenz und Hinweise zu Abhängigkeiten sind enthalten. Dateien bleiben auf Ihrem Computer. Kein Konto, keine Zahlung und kein Abonnement erforderlich.",
+    "ready.short": "Im Explorer bereit",
+    "updates.title": "Updates",
+    "updates.check": "Jetzt prüfen",
+    "updates.checking": "GitHub wird geprüft…",
+    "updates.current": "Die aktuelle Version ist installiert.",
+    "updates.available": "Version {0} kann heruntergeladen werden.",
+    "updates.offline": "Keine Verbindung. Später erneut versuchen.",
+    "updates.error": "Prüfung fehlgeschlagen. Später erneut versuchen.",
+    "updates.download": "Update herunterladen"
   },
   "zh": {
     "settings.title": "Windows 预览",
@@ -381,7 +408,16 @@
     "setup.runtime.failed": "无法安装 Microsoft 运行时，请重试或取消 Windows 集成。",
     "setup.registration.failed": "功能已安装，但 Windows 集成需要修复，请打开设置。",
     "setup.uninstall.failed": "无法恢复原有预览处理程序，卸载已在删除文件前停止。",
-    "setup.license": "Whatsinthebox 免费开源，采用 MIT 许可证。安装包包含原始许可证及依赖项声明。文件保留在本机，无需账户、付款或订阅。"
+    "setup.license": "Whatsinthebox 免费开源，采用 MIT 许可证。安装包包含原始许可证及依赖项声明。文件保留在本机，无需账户、付款或订阅。",
+    "ready.short": "已在文件资源管理器中就绪",
+    "updates.title": "更新",
+    "updates.check": "立即检查",
+    "updates.checking": "正在检查 GitHub…",
+    "updates.current": "已安装最新版本。",
+    "updates.available": "版本 {0} 已可下载。",
+    "updates.offline": "无法连接，请联网后重试。",
+    "updates.error": "无法检查，请稍后重试。",
+    "updates.download": "下载更新"
   },
   "tr": {
     "settings.title": "Windows önizlemeleri",
@@ -477,6 +513,15 @@
     "setup.runtime.failed": "Microsoft çalışma bileşeni kurulamadı. Yeniden dene veya Windows bağlantısı seçimini kaldır.",
     "setup.registration.failed": "Özellik kuruldu ancak Windows bağlantısı onarım gerektiriyor. Ayarları aç.",
     "setup.uninstall.failed": "Önceki önizleyiciler geri yüklenemedi. Dosyalar silinmeden kaldırma durduruldu.",
-    "setup.license": "Whatsinthebox, MIT lisansıyla ücretsiz ve açık kaynaklıdır. Orijinal lisans ve bağımlılık bildirimleri kurulumda bulunur. Dosyalar bilgisayarında kalır. Hesap, ödeme veya abonelik gerekmez."
+    "setup.license": "Whatsinthebox, MIT lisansıyla ücretsiz ve açık kaynaklıdır. Orijinal lisans ve bağımlılık bildirimleri kurulumda bulunur. Dosyalar bilgisayarında kalır. Hesap, ödeme veya abonelik gerekmez.",
+    "ready.short": "Dosya Gezgini’nde hazır",
+    "updates.title": "Güncellemeler",
+    "updates.check": "Şimdi kontrol et",
+    "updates.checking": "GitHub kontrol ediliyor…",
+    "updates.current": "En güncel sürümü kullanıyorsun.",
+    "updates.available": "{0} sürümü indirilmeye hazır.",
+    "updates.offline": "Bağlantı yok. İnternet geldiğinde tekrar dene.",
+    "updates.error": "Kontrol edilemedi. Daha sonra tekrar dene.",
+    "updates.download": "Güncellemeyi indir"
   }
 }
