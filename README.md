@@ -4,7 +4,7 @@
 
 Free Windows file previews. See inside. Stay in Explorer.
 
-**[Download for Windows](https://whatsinthebox.bakhtiyarajpl.chatgpt.site)** · [Releases](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.5.0) · [Security checks](docs/SECURITY-CHECKS.md)
+**[Download for Windows](https://whatsinthebox.bakhtiyarajpl.chatgpt.site)** · [Releases](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.5.1) · [Security checks](docs/SECURITY-CHECKS.md)
 
 English · Русский · Deutsch · 简体中文 · Türkçe
 
@@ -20,7 +20,7 @@ No separate file workspace, account, subscription, ads or telemetry. The app che
 
 ## Install in your language
 
-1. Download **Whatsinthebox-0.5.0-Setup.exe** from Releases.
+1. Download **Whatsinthebox-0.5.1-Setup.exe** from Releases.
 2. Choose English, Russian, German, Simplified Chinese or Turkish. Setup saves that choice for the feature.
 3. Keep Windows integration enabled, then reopen Explorer and press **Alt+P**.
 4. The finish page includes an optional, initially checked GitHub repository link. Uncheck it to finish without opening a browser.

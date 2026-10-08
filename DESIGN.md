@@ -11,3 +11,8 @@ English, Russian, German, Chinese and Turkish catalogs have identical keys. Inst
 Setup completion shows an author portrait and an optional initially checked repository link. Silent install opens no browser. Repair, uninstall and repository are maintenance actions; rendering stays in Explorer.
 
 Version 0.5: shared primary ink #182336; borderless compact maintenance window with rounded white surfaces, no oversized status table. The website uses the blue paper-and-box composition, one download action, and matching Inter type. Finish-page portrait owns the left rail; Inno controls retain the right rail. Update states reserve their geometry and never block previews.
+
+
+## Installer classic variant — 0.5.1
+The owner explicitly selected the classic Windows/Inno Setup wizard reference: blue illustrated left rail, white content pane, native Back/Next/Cancel/Finish buttons, no rounded marketing cards. Setup.iss is the canonical owner of this variant. Uses Inno Setup's bundled classic wizard assets and Tahoma; Chinese keeps Microsoft YaHei UI. Welcome page is visible. Completion keeps the blue rail with the authorized portrait and a muted author caption in the right pane; the native RunList stays in the right pane. The exact original GitHub repository action is checked by default, user-uncheckable, and skipifsilent. App and website keep their existing visual identity.
+Native Inno controls own navigation, progress, focus, checkbox states and scrollbars. All installer catalog descriptions use the selected language. Platform consent dialogs retain system-owned behavior.

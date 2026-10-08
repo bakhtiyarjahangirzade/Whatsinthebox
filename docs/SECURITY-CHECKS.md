@@ -28,3 +28,7 @@ See verification.json for the individual automated results. Setup/uninstall life
 55 renderer/UI/localization/update-selection checks passed. Newer published beta releases are supported; foreign download URLs are rejected. Five installer completion-page assertions passed: author portrait is visible, the original wizard image is hidden, and portrait bounds do not overlap the run list. The website resolver selects an uploaded setup asset, rejects foreign links, and retains a direct download fallback when API access fails.
 
 Update checks use the public GitHub HTTPS API. No file contents are sent; API requests include a product/version User-Agent. Automatic results are cached for 24 hours; manual checks bypass the cache. No update is executed or installed automatically.
+
+
+## 0.5.1 classic installer
+Classic native Inno wizard with its bundled blue artwork, welcome page, Tahoma and an author portrait on completion. Original GitHub repository action remains optional and checked by default; silent installs open no browser. 55 app checks passed. Isolated installer layout checks completed in all five languages. No new file-rendering behavior is introduced.
