@@ -1,4 +1,11 @@
-# Release security and verification — 0.4.0 beta
+# Release security and verification
+
+## 0.6.0 beta
+58 app checks passed, including a real TTF specimen and malformed/oversized font rejection. A real CFF OTF specimen was rendered successfully. Five isolated installer layout checks passed; a native completion-page screenshot shows the full-height portrait and default-selected GitHub action. TTF/OTF input is capped at 32 MiB and table offsets are checked before decoding. Preview uses the existing bounded worker and never installs a font. No new package dependency was added. Current NuGet query reported no known vulnerable packages. Setup is unsigned.
+
+See [results](verification-v06-summary.json).
+
+## Earlier 0.4.0 checks
 
 Checked on Windows x64, 8 October 2026. This is an engineering check, not an independent audit or certification.
 
@@ -17,7 +24,7 @@ The Defender signatures available during the check were dated 6 October 2026. A 
 
 SVG regression cases reject scripts, DTD/entity declarations, external references and unsafe CSS. ImageMagick delegates/remote-active coders are disabled. Document readers have entry/count/size limits and do not execute formulas, scripts or macros. PDF rendering and native image codecs remain attack surfaces; keep dependencies updated.
 
-The renderer is a separate process with bounded preview timeout, not an OS sandbox. Windows may load the small thumbnail adapter into Shell. A crash can leave local temporary previews. No user documents, private account credentials, installer logs or workstation screenshots are included in the public source. The author portrait was regenerated and published with the owner’s explicit request.
+The renderer is a separate process with bounded preview timeout, not an OS sandbox. Windows may load the small thumbnail adapter into Shell. A crash can leave local temporary previews. No user documents, private account credentials, installer logs or workstation screenshots are included in the public source. The author portrait is published with the owner’s authorization.
 
 The screenshots are actual application/native preview control captures using synthetic or project-owned fixtures. They are not fabricated Explorer mockups. Live Explorer UI capture and comprehensive testing across different PCs were not performed. Automated checks are fixtures, not guarantees of compatibility with every real file. The first public version remains a beta.
 

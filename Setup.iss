@@ -1,4 +1,4 @@
-﻿#define AppVersion "0.5.1"
+﻿#define AppVersion "0.6.0"
 [Setup]
 #ifdef QA_LAYOUT
 AppId={{4550FDF8-3F77-46AE-A439-7960CA00E9B4}
@@ -15,13 +15,13 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\..\outputs
-OutputBaseFilename=Whatsinthebox-0.5.1-Setup
+OutputBaseFilename=Whatsinthebox-0.6.0-Setup
 SetupIconFile=App\app.ico
-UninstallDisplayIcon={app}\0.5\Whatsinthebox.exe
+UninstallDisplayIcon={app}\0.6\Whatsinthebox.exe
 UninstallDisplayName=Whatsinthebox
 WizardStyle=classic
 DisableWelcomePage=no
-WizardImageFile=compiler:WizClassicImage.bmp
+WizardImageFile=App\wizard-portrait.bmp
 WizardSmallImageFile=compiler:WizClassicSmallImage.bmp
 Compression=lzma2/fast
 SolidCompression=yes
@@ -90,16 +90,14 @@ tr.setup_license=Whatsinthebox, MIT lisansıyla ücretsiz ve açık kaynaklıdı
 Name: "explorer"; Description: "{cm:setup_task}"; Flags: checkedonce
 
 [Files]
-Source: "release-v5\*"; DestDir: "{app}\0.5"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\runtime\*"; DestDir: "{app}\0.6"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\tools\windowsdesktop-runtime-x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 
-Source: "App\author.bmp"; DestDir: "{tmp}"; Flags: dontcopy
-Source: "App\Fonts\Inter-Regular.ttf"; DestDir: "{tmp}"; Flags: dontcopy
-Source: "LICENSE"; DestDir: "{app}\0.5"; Flags: ignoreversion
+Source: "LICENSE"; DestDir: "{app}\0.6"; Flags: ignoreversion
 
 [Icons]
 #ifndef QA_LAYOUT
-Name: "{group}\Whatsinthebox"; Filename: "{app}\0.5\Whatsinthebox.exe"
+Name: "{group}\Whatsinthebox"; Filename: "{app}\0.6\Whatsinthebox.exe"
 Name: "{group}\{cm:uninstall} Whatsinthebox"; Filename: "{uninstallexe}"
 
 #endif
@@ -107,23 +105,17 @@ Name: "{group}\{cm:uninstall} Whatsinthebox"; Filename: "{uninstallexe}"
 #ifndef QA_LAYOUT
 Type: files; Name: "{group}\Whatsinthebox.lnk"
 Type: files; Name: "{userdesktop}\Whatsinthebox.lnk"
+Type: filesandordirs; Name: "{app}\0.3"
+Type: filesandordirs; Name: "{app}\0.4"
+Type: filesandordirs; Name: "{app}\0.5"
 
 #endif
 [Run]
-Filename: "{app}\0.5\Whatsinthebox.exe"; Description: "{cm:setup_settings}"; Flags: nowait postinstall skipifsilent unchecked
+Filename: "{app}\0.6\Whatsinthebox.exe"; Description: "{cm:setup_settings}"; Flags: nowait postinstall skipifsilent unchecked
 
 Filename: "https://github.com/bakhtiyarjahangirzade/Whatsinthebox"; Description: "{cm:setup_github}"; Flags: shellexec postinstall skipifsilent
 
 [Code]
-function AddFontResourceEx(FileName: String; Flags: LongWord; Reserved: Integer): Integer; external 'AddFontResourceExW@gdi32.dll stdcall';
-function InitializeSetup: Boolean;
-begin
- ExtractTemporaryFile('Inter-Regular.ttf');
- AddFontResourceEx(ExpandConstant('{tmp}\Inter-Regular.ttf'), 16, 0);
- Result := True;
-end;
-
-var Portrait: TBitmapImage; Author: TNewStaticText;
 #ifdef QA_LAYOUT
 function PostMessage(Window: HWND; Message: LongWord; WParam: THandle; LParam: Longint): Boolean; external 'PostMessageW@user32.dll stdcall';
 #endif
@@ -131,13 +123,6 @@ procedure InitializeWizard;
 begin
  WizardSelectTasks('explorer'); WizardForm.Font.Name := 'Tahoma';
  if ActiveLanguage = 'zh' then WizardForm.Font.Name := 'Microsoft YaHei UI';
- ExtractTemporaryFile('author.bmp');
- Portrait := TBitmapImage.Create(WizardForm); Portrait.Parent := WizardForm.FinishedPage;
- Portrait.Left := ScaleX(20); Portrait.Top := ScaleY(124); Portrait.Width := ScaleX(124); Portrait.Height := ScaleY(124); Portrait.Stretch := True;
- Portrait.Bitmap.LoadFromFile(ExpandConstant('{tmp}\author.bmp'));
- Author := TNewStaticText.Create(WizardForm); Author.Parent := WizardForm.FinishedPage;
- Author.Left := ScaleX(176); Author.Top := ScaleY(264); Author.Width := ScaleX(304); Author.Height := ScaleY(44);
- Author.AutoSize := False; Author.WordWrap := True; Author.Font.Color := clGray; Author.Caption := ExpandConstant('{cm:setup_author}');
 #ifdef QA_LAYOUT
  PostMessage(WizardForm.NextButton.Handle, $00F5, 0, 0);
 #endif
@@ -149,10 +134,10 @@ begin
 #endif
  if CurPageID = wpFinished then begin
   WizardForm.WizardBitmapImage2.Visible := True;
-  Portrait.Visible := True; Author.Visible := True; Portrait.BringToFront; Author.BringToFront;
+
 #ifdef QA_LAYOUT
-  if not Portrait.Visible or not WizardForm.WizardBitmapImage2.Visible or (Portrait.Left + Portrait.Width >= WizardForm.RunList.Left) then RaiseException('Finish portrait layout failed');
-  SaveStringToFile(RemoveQuotes(ExpandConstant('{param:QALAYOUT|}')), 'portrait-visible=true; classic-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=' + ActiveLanguage, False);
+  if not WizardForm.WizardBitmapImage2.Visible then RaiseException('Finish portrait rail not visible');
+  SaveStringToFile(RemoveQuotes(ExpandConstant('{param:QALAYOUT|}')), 'portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=' + ActiveLanguage, False);
 #ifndef QA_REVIEW
   WizardForm.RunList.Checked[0] := False; WizardForm.RunList.Checked[1] := False;
 #endif
@@ -183,8 +168,9 @@ begin
   Code := 0;
   if FileExists(ExpandConstant('{app}\0.4\Whatsinthebox.exe')) then Exec(ExpandConstant('{app}\0.4\Whatsinthebox.exe'), '--stop-windows-host', '', SW_HIDE, ewWaitUntilTerminated, Code);
   if FileExists(ExpandConstant('{app}\0.3\Whatsinthebox.exe')) then Exec(ExpandConstant('{app}\0.3\Whatsinthebox.exe'), '--stop-windows-host', '', SW_HIDE, ewWaitUntilTerminated, Code);
-  if FileExists(ExpandConstant('{app}\0.5\Whatsinthebox.exe')) then
-    Exec(ExpandConstant('{app}\0.5\Whatsinthebox.exe'), '--stop-windows-host', ExpandConstant('{app}\0.5'), SW_HIDE, ewWaitUntilTerminated, Code);
+  if FileExists(ExpandConstant('{app}\0.5\Whatsinthebox.exe')) then Exec(ExpandConstant('{app}\0.5\Whatsinthebox.exe'), '--stop-windows-host', '', SW_HIDE, ewWaitUntilTerminated, Code);
+  if FileExists(ExpandConstant('{app}\0.6\Whatsinthebox.exe')) then
+    Exec(ExpandConstant('{app}\0.6\Whatsinthebox.exe'), '--stop-windows-host', ExpandConstant('{app}\0.6'), SW_HIDE, ewWaitUntilTerminated, Code);
   if WizardIsTaskSelected('explorer') and not DesktopRuntimeInstalled then begin
     ExtractTemporaryFile('windowsdesktop-runtime-x64.exe');
     if not ShellExec('runas', ExpandConstant('{tmp}\windowsdesktop-runtime-x64.exe'), '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, Code) then
@@ -203,9 +189,9 @@ begin
 #ifdef QA_LAYOUT
  Exit;
 #endif
-  if CurStep = ssPostInstall then Exec(ExpandConstant('{app}\0.5\Whatsinthebox.exe'), '--set-language ' + ActiveLanguage, '', SW_HIDE, ewWaitUntilTerminated, Code);
+  if CurStep = ssPostInstall then Exec(ExpandConstant('{app}\0.6\Whatsinthebox.exe'), '--set-language ' + ActiveLanguage, '', SW_HIDE, ewWaitUntilTerminated, Code);
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('explorer') then begin
-    if not Exec(ExpandConstant('{app}\0.5\Whatsinthebox.exe'), '--register', ExpandConstant('{app}\0.5'), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then begin
+    if not Exec(ExpandConstant('{app}\0.6\Whatsinthebox.exe'), '--register', ExpandConstant('{app}\0.6'), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then begin
       Log('Explorer registration failed: ' + IntToStr(Code));
       if not WizardSilent then MsgBox(ExpandConstant('{cm:setup_registration_failed}'), mbError, MB_OK);
     end;
@@ -216,7 +202,7 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var Code: Integer;
 begin
   if CurUninstallStep = usUninstall then begin
-    if not Exec(ExpandConstant('{app}\0.5\Whatsinthebox.exe'), '--unregister', ExpandConstant('{app}\0.5'), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then
+    if not Exec(ExpandConstant('{app}\0.6\Whatsinthebox.exe'), '--unregister', ExpandConstant('{app}\0.6'), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then
       RaiseException(ExpandConstant('{cm:setup_uninstall_failed}'));
   end;
 end;

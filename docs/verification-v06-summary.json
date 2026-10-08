@@ -1,0 +1,18 @@
+{
+  "version": "0.6.0",
+  "app_checks": 58,
+  "font_checks": {
+    "TTF": "passed",
+    "OTF_CFF": "passed",
+    "invalid": "rejected",
+    "over_32MiB": "rejected"
+  },
+  "installer": {
+    "en": "portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=en",
+    "ru": "portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=ru",
+    "de": "portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=de",
+    "zh": "portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=zh",
+    "tr": "portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=tr"
+  },
+  "scope": "TTF and OTF preview only; no font installation. Collection and web-font formats are not supported. Native parser remains an attack surface; bounded worker is not an OS sandbox."
+}

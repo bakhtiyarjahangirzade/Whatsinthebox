@@ -102,7 +102,16 @@
     "updates.available": "Version {0} is ready to download.",
     "updates.offline": "No connection. Try again when online.",
     "updates.error": "Could not check. Try again later.",
-    "updates.download": "Download update"
+    "updates.download": "Download update",
+    "font.mode": "Font preview",
+    "font.invalid": "Font file is invalid or unsupported.",
+    "font.limit": "Font files larger than 32 MiB are not supported.",
+    "font.note": "Preview only. This font was not installed.",
+    "font.sample": "Sample text",
+    "font.characters": "Characters",
+    "font.missing": "Some sample characters are not included in this font.",
+    "font.details": "Weight {0} · {1} glyphs",
+    "font.sentence": "The quick brown fox jumps over the lazy dog."
   },
   "ru": {
     "settings.title": "Предпросмотр Windows",
@@ -207,7 +216,16 @@
     "updates.available": "Версия {0} доступна для загрузки.",
     "updates.offline": "Нет соединения. Повторите позже.",
     "updates.error": "Не удалось проверить. Повторите позже.",
-    "updates.download": "Скачать обновление"
+    "updates.download": "Скачать обновление",
+    "font.mode": "Предпросмотр шрифта",
+    "font.invalid": "Файл шрифта повреждён или не поддерживается.",
+    "font.limit": "Файлы шрифтов больше 32 МиБ не поддерживаются.",
+    "font.note": "Только предпросмотр. Шрифт не установлен.",
+    "font.sample": "Пример текста",
+    "font.characters": "Символы",
+    "font.missing": "Некоторые символы примера отсутствуют в этом шрифте.",
+    "font.details": "Насыщенность {0} · {1} глифов",
+    "font.sentence": "Съешь ещё этих мягких французских булок."
   },
   "de": {
     "settings.title": "Windows-Vorschau",
@@ -312,7 +330,16 @@
     "updates.available": "Version {0} kann heruntergeladen werden.",
     "updates.offline": "Keine Verbindung. Später erneut versuchen.",
     "updates.error": "Prüfung fehlgeschlagen. Später erneut versuchen.",
-    "updates.download": "Update herunterladen"
+    "updates.download": "Update herunterladen",
+    "font.mode": "Schriftvorschau",
+    "font.invalid": "Schriftdatei ungültig oder nicht unterstützt.",
+    "font.limit": "Schriftdateien über 32 MiB werden nicht unterstützt.",
+    "font.note": "Nur Vorschau. Diese Schrift wurde nicht installiert.",
+    "font.sample": "Beispieltext",
+    "font.characters": "Zeichen",
+    "font.missing": "Einige Beispielzeichen sind in dieser Schrift nicht enthalten.",
+    "font.details": "Gewicht {0} · {1} Glyphen",
+    "font.sentence": "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern."
   },
   "zh": {
     "settings.title": "Windows 预览",
@@ -417,7 +444,16 @@
     "updates.available": "版本 {0} 已可下载。",
     "updates.offline": "无法连接，请联网后重试。",
     "updates.error": "无法检查，请稍后重试。",
-    "updates.download": "下载更新"
+    "updates.download": "下载更新",
+    "font.mode": "字体预览",
+    "font.invalid": "字体文件无效或不受支持。",
+    "font.limit": "不支持超过 32 MiB 的字体文件。",
+    "font.note": "仅预览。此字体未安装。",
+    "font.sample": "示例文本",
+    "font.characters": "字符",
+    "font.missing": "此字体不包含部分示例字符。",
+    "font.details": "字重 {0} · {1} 个字形",
+    "font.sentence": "字体预览：天地玄黄，宇宙洪荒。"
   },
   "tr": {
     "settings.title": "Windows önizlemeleri",
@@ -522,6 +558,15 @@
     "updates.available": "{0} sürümü indirilmeye hazır.",
     "updates.offline": "Bağlantı yok. İnternet geldiğinde tekrar dene.",
     "updates.error": "Kontrol edilemedi. Daha sonra tekrar dene.",
-    "updates.download": "Güncellemeyi indir"
+    "updates.download": "Güncellemeyi indir",
+    "font.mode": "Yazı tipi önizlemesi",
+    "font.invalid": "Yazı tipi dosyası geçersiz veya desteklenmiyor.",
+    "font.limit": "32 MiB üzerindeki yazı tipi dosyaları desteklenmiyor.",
+    "font.note": "Yalnızca önizleme. Yazı tipi sisteme kurulmadı.",
+    "font.sample": "Örnek metin",
+    "font.characters": "Karakterler",
+    "font.missing": "Bu yazı tipi bazı örnek karakterleri içermiyor.",
+    "font.details": "Ağırlık {0} · {1} glif",
+    "font.sentence": "Pijamalı hasta yağız şoföre çabucak güvendi."
   }
 }

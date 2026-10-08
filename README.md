@@ -4,7 +4,7 @@
 
 Free Windows file previews. See inside. Stay in Explorer.
 
-**[Download for Windows](https://whatsinthebox.bakhtiyarajpl.chatgpt.site)** · [Releases](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.5.1) · [Security checks](docs/SECURITY-CHECKS.md)
+**[Download for Windows](https://bakhtiyarjahangirzade.github.io/Whatsinthebox)** · [Releases](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v0.6.0) · [Security checks](docs/SECURITY-CHECKS.md)
 
 English · Русский · Deutsch · 简体中文 · Türkçe
 
@@ -20,12 +20,14 @@ No separate file workspace, account, subscription, ads or telemetry. The app che
 
 ## Install in your language
 
-1. Download **Whatsinthebox-0.5.1-Setup.exe** from Releases.
+1. Download **Whatsinthebox-0.6.0-Setup.exe** from Releases.
 2. Choose English, Russian, German, Simplified Chinese or Turkish. Setup saves that choice for the feature.
 3. Keep Windows integration enabled, then reopen Explorer and press **Alt+P**.
 4. The finish page includes an optional, initially checked GitHub repository link. Uncheck it to finish without opening a browser.
 
-The completion page also shows the regenerated author portrait.
+The welcome and completion pages use the full-height author portrait.
+
+![Installer completion](docs/screenshots/setup-finish.png)
 
 <img src="docs/screenshots/settings-en.png" width="620" alt="Actual settings form control capture" />
 
@@ -35,12 +37,15 @@ Remove from Windows Settings → Apps, the Start menu uninstall shortcut, or the
 
 **Unsigned beta:** this release has no publisher signing certificate. Windows reputation prompts can appear. Security checks are documented; they are not a guarantee that software or every input is risk-free.
 
+![Font specimen preview](docs/screenshots/font-preview.png)
+
 ## Format support, honestly
 
 | Files | What you see |
 |---|---|
 | PDF | Real pages, with previous/next navigation. Password-protected PDFs are unsupported. |
 | PNG, JPEG, BMP, WebP, GIF, TIFF | Image preview; first frame/page for multi-image files. |
+| TTF / OTF | Font family, specimen text and supported characters. Preview only; no font installation. |
 | PSD / PSB | Saved composite image. Layer editing is outside scope. |
 | CDR | Embedded thumbnail in ZIP-based CorelDRAW files. Legacy binary CDR and files without a saved preview are unsupported. |
 | SVG | Static, self-contained vectors. Scripts, DTDs, external references and embedded images are rejected. Safe local CSS is supported. |
@@ -66,7 +71,7 @@ ImageMagick delegates and remote/active coders are disabled. Office XML uses bou
 Windows x64, .NET 10 SDK:
 
     ./build.ps1
-    ./release-v5/Whatsinthebox.exe --self-test results.json
+    ./dist/runtime/Whatsinthebox.exe --self-test results.json
     dotnet list App/App.csproj package --vulnerable --include-transitive
 
 To build the installer, place the official Microsoft .NET 10 Desktop Runtime x64 installer at ../tools/windowsdesktop-runtime-x64.exe and verify its Microsoft signature. Compile Setup.iss with Inno Setup 6.7.3, for example ISCC /Odist Setup.iss. Check Inno Setup’s current distribution/commercial license terms before commercial use. The project source is MIT; third-party licenses are included separately.
@@ -79,7 +84,7 @@ Bug reports with Windows version, file extension and a non-sensitive sample are 
 
 Created by [Bakhtiyar Jahangirzade](https://github.com/bakhtiyarjahangirzade). Free and open source, with an original macOS-inspired visual style. Apple assets are not included and this project is not affiliated with Apple.
 
-<img src="App/author.png" width="96" alt="Regenerated author portrait" />
+<img src="App/author.png" width="96" alt="Author portrait" />
 
 <details><summary>Русский</summary>
 

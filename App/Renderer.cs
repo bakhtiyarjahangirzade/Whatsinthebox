@@ -26,7 +26,8 @@ static class Renderer
             byte[] head=new byte[512];using(var stream=File.OpenRead(input)){stream.ReadExactly(head.AsSpan(0,(int)Math.Min(head.Length,stream.Length)));}
             string ext=Path.GetExtension(input).ToLowerInvariant();
             Environment.SetEnvironmentVariable("MAGICK_CONFIGURE_PATH",AppContext.BaseDirectory);
-            if(Encoding.ASCII.GetString(head).Contains("%PDF-")){info=RenderPdf(input,output,page);}
+            if(SupportedFiles.FontExtensions.Contains(ext)){info=FontPreview.Render(input,output);}
+            else if(Encoding.ASCII.GetString(head).Contains("%PDF-")){info=RenderPdf(input,output,page);}
             else if(SupportedFiles.TextExtensions.Contains(ext)){info=RenderText(ReadText(input),output,page,L.T("text.mode"),Path.GetFileName(input));}
             else if(head[0]==80&&head[1]==75){info=RenderPackage(input,output,page);}
             else if(ext==".svg"||Encoding.UTF8.GetString(head).Contains("<svg",StringComparison.OrdinalIgnoreCase)||Encoding.UTF8.GetString(head).Contains("<?xml")||Encoding.UTF8.GetString(head).TrimStart('\uFEFF',' ','\n','\r','\t').StartsWith("<!--")){info=RenderSvg(input,output);}

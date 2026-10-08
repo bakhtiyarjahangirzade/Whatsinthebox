@@ -26,6 +26,6 @@ Package-declared licenses and copyright notices; native codec notices are includ
 | Svg.SceneGraph | 5.2.3 | MIT | Copyright © Wiesław Šoltés 2026 |
 | Svg.Skia | 5.2.3 | MIT | Copyright © Wiesław Šoltés 2026 |
 
-Inter 4.1 — SIL Open Font License 1.1. See App/Fonts/LICENSE.txt. Icon and regenerated author portrait were created for this project using OpenAI image generation; no Apple icon or font is bundled. The portrait was published with the account owner’s authorization.
+Inter 4.1 — SIL Open Font License 1.1. See App/Fonts/LICENSE.txt. Icon and author portrait are project assets; no Apple icon or font is bundled. The portrait was published with the account owner’s authorization.
 
 Native PDFium copyright and bundled library notices from the matching chromium/7961 upstream Windows x64 archive are included in licenses/PDFium-native.

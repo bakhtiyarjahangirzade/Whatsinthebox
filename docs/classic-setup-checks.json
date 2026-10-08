@@ -11,5 +11,5 @@
   "app_checks": 55,
   "app_failed": 0,
   "github_action": "Exact original repository URL; checked by default via native Inno postinstall flags, user may uncheck; disabled during silent installs.",
-  "visual_capture": "Native final-page inspection showed classic blue rail, portrait and GitHub checkbox. Final screenshot collection was stopped by the user; no new final screenshot is published."
+  "visual_capture": "Native final-page inspection showed classic blue rail, portrait and GitHub checkbox. No final screenshot was published for this release."
 }
