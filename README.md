@@ -22,14 +22,14 @@ Original proportions are preserved. Fit enlarges small artwork as well as shrink
 
 ### Before → After
 
-The same PDF, without a working preview handler and with Whatsinthebox:
+The same Azerbaijan Airlines SVG logo, without a working preview handler and with Whatsinthebox:
 
 | Before | After · Whatsinthebox |
 |:---:|:---:|
-| <img src="docs/screenshots/no-preview.svg" width="280" alt="Illustration of a PDF with no working preview handler"> | <img src="docs/screenshots/windows-preview.png" width="280" alt="Actual PDF preview captured by the 1.0 Windows integration test"> |
-| A filename, no view inside. | Read the document and move between pages. |
+| <img src="docs/screenshots/no-preview.svg" width="280" alt="Illustration of an SVG with no working preview handler"> | <img src="docs/screenshots/logo-preview.png" width="280" alt="Azerbaijan Airlines logo rendered by Whatsinthebox from the supplied SVG"> |
+| A filename, no view inside. | See the artwork, with its original proportions. |
 
-The before panel is an illustration; the after panel is an actual Windows test capture. Existing handlers may already preview some formats.
+The before panel is an illustration; the after image was rendered by Whatsinthebox from the supplied SVG. Existing handlers may already preview some formats. The logo belongs to its respective owner and is used only to illustrate file previews; no affiliation is implied.
 
 ## File support
 
