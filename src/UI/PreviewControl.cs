@@ -92,7 +92,7 @@ public sealed class PreviewControl : UserControl
     }
     protected override void Dispose(bool disposing){if(disposing){generation++;cancellation?.Cancel();cancellation?.Dispose();}base.Dispose(disposing);}
     public bool HasPreview=>canvas.HasImage&&!loading;
-    bool CaptureEnabled(string input){string marker=Path.Combine(Path.GetDirectoryName(RendererPath)!,"test-capture.flag");return File.Exists(marker)&&File.ReadAllText(marker).Trim().Equals(Path.GetFullPath(input),StringComparison.OrdinalIgnoreCase);}
+    bool CaptureEnabled(string input){string marker=Path.Combine(Path.GetDirectoryName(RendererPath)!,"test-capture.flag");if(!File.Exists(marker))return false;string value=File.ReadAllText(marker).Trim();return value.Equals(Path.GetFullPath(input),StringComparison.OrdinalIgnoreCase)||(value=="*"&&Environment.GetEnvironmentVariable("GITHUB_ACTIONS")=="true");}
 }
 
 public sealed class ImageCanvas : Control

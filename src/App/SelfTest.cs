@@ -5,6 +5,17 @@ using Whatsinthebox.UI;
 namespace Whatsinthebox;
 static class SelfTest
 {
+    public static void WriteExplorerFixtures(string folder)
+    {
+        Directory.CreateDirectory(folder);using var bitmap=new Bitmap(640,320);
+        using(var graphics=Graphics.FromImage(bitmap)){graphics.FillRectangle(Brushes.CornflowerBlue,0,0,320,160);graphics.FillRectangle(Brushes.Orange,320,0,320,160);graphics.FillRectangle(Brushes.ForestGreen,0,160,320,160);graphics.FillRectangle(Brushes.Crimson,320,160,320,160);}
+        foreach(var item in new[]{("png",System.Drawing.Imaging.ImageFormat.Png),("jpg",System.Drawing.Imaging.ImageFormat.Jpeg),("jpeg",System.Drawing.Imaging.ImageFormat.Jpeg),("bmp",System.Drawing.Imaging.ImageFormat.Bmp),("gif",System.Drawing.Imaging.ImageFormat.Gif),("tiff",System.Drawing.Imaging.ImageFormat.Tiff)})bitmap.Save(Path.Combine(folder,"sample."+item.Item1),item.Item2);
+        File.WriteAllBytes(Path.Combine(folder,"sample.pdf"),MakePdf());
+        File.WriteAllText(Path.Combine(folder,"sample.svg"),"<svg xmlns='http://www.w3.org/2000/svg' width='640' height='320'><rect width='640' height='320' fill='#4688cc'/><circle cx='320' cy='160' r='100' fill='#ff9933'/></svg>");
+        foreach(var format in new[]{("psd",ImageMagick.MagickFormat.Psd),("webp",ImageMagick.MagickFormat.WebP)}){using var image=new ImageMagick.MagickImage(ImageMagick.MagickColors.CornflowerBlue,640,320);image.Write(Path.Combine(folder,"sample."+format.Item1),format.Item2);}
+        using(var zip=ZipFile.Open(Path.Combine(folder,"sample.cdr"),ZipArchiveMode.Create))zip.CreateEntryFromFile(Path.Combine(folder,"sample.png"),"previews/page1.png");
+        File.Copy(Path.Combine(AppContext.BaseDirectory,"Fonts","Inter-Regular.ttf"),Path.Combine(folder,"sample.ttf"),true);
+    }
     public static int Capture(string file,string output)
     {
         using var form=new Form{ClientSize=new Size(900,680)};var preview=new PreviewControl(true){Dock=DockStyle.Fill,RendererPath=Environment.ProcessPath!};form.Controls.Add(preview);form.Show();var task=preview.LoadFileAsync(file);var until=DateTime.UtcNow.AddSeconds(20);while(!task.IsCompleted&&DateTime.UtcNow<until){Application.DoEvents();Thread.Sleep(20);}if(!preview.HasPreview)return 1;using var bitmap=new Bitmap(preview.Width,preview.Height);preview.DrawToBitmap(bitmap,preview.ClientRectangle);bitmap.Save(output);form.Close();return 0;

@@ -27,6 +27,7 @@ static class Program
   ApplicationConfiguration.Initialize();string report=args[0];var results=new List<object>();int failed=0;
   if(args.Length==3&&args[1]=="--thumbnails-only")return SystemHostTests.Run(report,args[2],true);
   if(args.Length==3&&args[1]=="--system-host")return SystemHostTests.Run(report,args[2]);
+  if(args.Length==3&&args[1]=="--explorer")return ExplorerTests.Run(report,args[2]);
   var root=Path.Combine(Path.GetTempPath(),"Whatsinthebox-COM-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
   try
   {
