@@ -9,7 +9,7 @@ $results=[Collections.Generic.List[object]]::new()
 function RunCheck([string]$name,[string]$file,[string[]]$arguments,[int]$timeout=120){
  $stdout=Join-Path $evidence ($name+'.stdout.txt')
  $stderr=Join-Path $evidence ($name+'.stderr.txt')
- $process=Start-Process -FilePath $file -ArgumentList $arguments -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+ $process=Start-Process -FilePath $file -ArgumentList $arguments -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
  $handle=$process.Handle
  $completed=$process.WaitForExit($timeout*1000)
  if(!$completed){Stop-Process -Id $process.Id -Force;$results.Add(@{name=$name;passed=$false;timeout=$true});throw "Timed out: $name"}
@@ -29,7 +29,7 @@ try {
  $results.Add(@{name='registration-cleanup';passed=!$exists -and !$startup})
  if($exists -or $startup){throw 'Registration cleanup failed'}
 }finally {
- $results | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $evidence 'summary.json') -Encoding UTF8
  # Only the disposable runner's own registrations are restored here.
- if(Test-Path -LiteralPath $app){$cleanup=Start-Process -FilePath $app -ArgumentList '--unregister' -PassThru -Wait}
+ try {if(Test-Path -LiteralPath $app){RunCheck 'final-cleanup' $app @('--unregister')}}
+ finally {$results | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $evidence 'summary.json') -Encoding UTF8}
 }

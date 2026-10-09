@@ -5,7 +5,7 @@ The 1.0 release is **not approved yet**. A reported Explorer/Start-menu incident
 | Check | Latest evidence | Status |
 |---|---|---|
 | Application and shell build | Release compilation | Passed |
-| Renderer, format and localization suite | 58 windowless checks | Passed |
+| Renderer, format, localization and update suite | 60 windowless checks | Passed |
 | Geometry | 17 checks and 1,000 deterministic cases | Passed |
 | Private PDF compatibility | 16 pages across nine files, plus a synthetic header-offset case | Passed locally; private inputs excluded |
 | Dependency advisories | NuGet audit with transitive dependencies | No advisories reported at the time of the check |
