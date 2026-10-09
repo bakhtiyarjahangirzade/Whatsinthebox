@@ -1,4 +1,19 @@
-# Release verification — 1.0.0
+# Release verification — 1.0.1
+
+Exact application source: `9b58150`. Installer SHA256: `26b7efbe0f5817350afe194a55e24af9d52122444ff2a84d7b28eed2e181bd22`. The published 74,434,270-byte installer is the successful Windows 2025 artifact, not a later rebuild. It remains unsigned.
+
+Both [Windows 2025](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37990214725) and [Windows 2022](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37990217849) passed **73 application/UI checks** and **114 installer assertions**. The checks include native preview/thumbnail calls after upgrading with the old DLL still loaded, common image preview preservation, automatic Windows preference configuration and exact preference restoration on removal.
+
+Changes include new class identities to avoid stale factories, PNG XML metadata detection, safe handling of legacy SVG DOCTYPE declarations, smaller fit margins and consistent setup version comparison. Common native Windows image previews remain in place. Only the small native thumbnail forwarding factory opts out of the inaccessible system surrogate; decoding and managed UI remain in the separate application. This is not a full OS sandbox.
+
+Installation and repair run one bounded background pass over existing cached thumbnails in Downloads, Desktop and Documents, including up to two subfolder levels. Enumeration is limited to 512 files per root and skips network, offline, cloud recall and reparse entries. It checks a time/cancellation budget and never clears the global cache or removes file security marks. New files use normal Windows thumbnail requests.
+
+Local PDF inputs use seekable reads up to the library's 4 GiB Windows limit. Named local Shell streams avoid copying the entire input. Anonymous streams remain limited to 256 MiB. A synthetic 300 MB PDF regression fixture passes. Rendering child processes have a 768 MiB process-memory cap and are killed when their owning job closes; UI/thumbnail waits retain their time limits.
+
+Windows can block downloaded files before invoking any full preview handler. No global security policy is changed and download marks are not removed automatically. Damaged or protected documents and practical resource limits remain exceptions; rendering success is not a claim that Windows will allow every file into its preview pane. A dedicated interactive Windows 11 desktop regression remains incomplete.
+
+## Previous 1.0.0 evidence
+
 
 The published installer is the exact artifact produced and exercised by the Windows verification workflow. Application source: `6804f3daa67ae2090059b7afb7f07735309dc6e8`. Documentation and website publishing do not change that binary.
 

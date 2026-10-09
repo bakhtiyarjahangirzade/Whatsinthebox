@@ -27,3 +27,6 @@ Installer maintenance flow: a first install uses the normal wizard. Existing ins
 The marketing hero shows one Document.pdf before and after in equal-size panels. Before is explicitly an illustration of no working preview handler; after uses the actual 1.0 native Windows test capture. Do not imply every Windows machine lacks PDF support. All comparison labels follow the five-language catalog. Image geometry uses contain with no cropping or stretching. Existing blue/gray website tokens and Inter typography remain canonical.
 
 Comparison sample updated to the user-supplied Azerbaijan Airlines SVG. After is the actual windowless renderer output, not an Explorer screenshot. Captions follow that provenance; do not describe it as a PDF. Preserve its source ratio with contain. Original private files are not bundled with the app.
+
+## Automatic Windows integration — 1.0.1
+Installation enables preview/thumbnail preferences and restores them on removal. Common native image previews are preserved. One bounded background cache maintenance pass runs after installation or repair, with no per-file repair step in the normal flow. Existing Windows download-security gates remain explicit platform limits. Native forwarding stays small; decoding runs in memory-bounded child jobs.

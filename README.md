@@ -3,16 +3,16 @@
  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-187dbd?style=flat-square" alt="MIT license"></a>
  <img src="https://img.shields.io/badge/platform-Windows_x64-253f56?style=flat-square" alt="Windows x64">
  <a href="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/workflows/checks.yml"><img src="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/workflows/checks.yml/badge.svg" alt="Build and checks"></a>
- <a href="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-1.0.0-187dbd?style=flat-square" alt="Release 1.0.0"></a>
+ <a href="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.1"><img src="https://img.shields.io/badge/release-1.0.1-187dbd?style=flat-square" alt="Release 1.0.1"></a>
 </p>
 <p align="center"><strong>Local file previews, right where your files live.</strong><br>PDFs, artwork, images and fonts. Free and open source.</p>
 <p align="center"><a href="https://whatsinthebox-app.vercel.app">Website</a> · <a href="#how-it-works">How it works</a> · <a href="#file-support">File support</a> · <a href="docs/verification.md">Release checks</a> · <a href="CONTRIBUTING.md">Build from source</a></p>
 
 ## Release status
 
-**[Download Whatsinthebox 1.0.0 for Windows x64 →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v1.0.0/Whatsinthebox-1.0.0-Setup.exe)**
+**[Download Whatsinthebox 1.0.1 for Windows x64 →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v1.0.1/Whatsinthebox-1.0.1-Setup.exe)**
 
-One installer, five languages, no separate runtime installation and no administrator requirement. Existing installations offer update or repair; removal restores the handlers that were replaced. The installer is unsigned, so Windows may show a publisher warning. [Verification and checksums →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.0)
+One installer, five languages, no separate runtime installation and no administrator requirement. Existing installations offer update or repair; removal restores the handlers that were replaced. The installer is unsigned, so Windows may show a publisher warning. [Verification and checksums →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.1)
 
 ## How it works
 
@@ -57,7 +57,7 @@ The five-language wizard detects the local version before changing files:
 | Same | Repair |
 | Newer | Refuse downgrade |
 
-Updates preserve settings. A disabled Windows integration stays deselected. The helper must stop before setup proceeds; busy helpers block installation. Fresh version folders avoid overwriting loaded binaries. Setup does not close Explorer, restart unrelated apps or silently refresh every thumbnail cache.
+Updates preserve settings. A disabled Windows integration stays deselected. The helper must stop before setup proceeds; busy helpers block installation. Fresh version folders avoid overwriting loaded binaries. Setup enables Windows preview/thumbnail preferences and preserves native previews for common images. A bounded background pass refreshes existing local thumbnails in common folders. Removal restores the previous preferences. Setup does not close Explorer or restart Windows.
 
 <p align="center"><img src="docs/screenshots/setup-finish.png" width="500" alt="Classic installer completion with the author portrait"></p>
 
