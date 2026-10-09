@@ -24,6 +24,7 @@ static class Program
  [DllImport("shlwapi.dll",CharSet=CharSet.Unicode,ExactSpelling=true)]static extern int SHCreateStreamOnFileEx(string file,uint mode,uint attributes,bool create,IStream? template,out IStream stream);
  [STAThread]static int Main(string[] args)
  {
+  if(args.Length==3&&args[1]=="--explorer")File.WriteAllText(args[0]+".entry","Main entered; session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
   ApplicationConfiguration.Initialize();string report=args[0];var results=new List<object>();int failed=0;
   if(args.Length==3&&args[1]=="--thumbnails-only")return SystemHostTests.Run(report,args[2],true);
   if(args.Length==3&&args[1]=="--system-host")return SystemHostTests.Run(report,args[2]);
