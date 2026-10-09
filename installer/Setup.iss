@@ -227,7 +227,7 @@ begin
   end;
   InstalledExists := Best <> -1;
   if InstalledExists then begin
-    InstalledComparison := ComparePackedVersion(Best, {#StrToVersion(AppVersion)});
+    InstalledComparison := ComparePackedVersion(Best, VersionValue('{#AppVersion}'));
     Log('Detected installation: ' + InstalledVersion + '; setup: {#AppVersion}; comparison: ' + IntToStr(InstalledComparison));
   end;
 end;
