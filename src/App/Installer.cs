@@ -64,7 +64,8 @@ static class Installer
                 using var cls=Registry.CurrentUser.CreateSubKey($@"Software\Classes\CLSID\{id}");cls.SetValue("","Whatsinthebox Windows extension");cls.DeleteValue("AppID",false);
                 Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\AppID\{id}",false);
                 using var local=cls.CreateSubKey("LocalServer32");local.SetValue("",$"\"{Path.Combine(bin,"Whatsinthebox.exe")}\" --windows-host");local.SetValue("ServerExecutable",Path.Combine(bin,"Whatsinthebox.exe"));
-                if(id==IntegrationIds.Thumbnail)cls.SetValue("DisableProcessIsolation",1,RegistryValueKind.DWord);
+                // Both file and stream initialization are supported; retain Windows' default thumbnail isolation.
+                cls.DeleteValue("DisableProcessIsolation",false);
                 using var server=cls.CreateSubKey("InprocServer32");server.SetValue("",Path.Combine(bin,"shell","Whatsinthebox.Shell.comhost.dll"));server.SetValue("ThreadingModel","Apartment");
             }
             using(var list=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\PreviewHandlers"))list.SetValue(IntegrationIds.Preview,"Whatsinthebox");
