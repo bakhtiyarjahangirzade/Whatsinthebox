@@ -9,6 +9,6 @@ New-Item -ItemType Directory -Path $output -Force | Out-Null
 $environment=Join-Path $installation 'VC/Auxiliary/Build/vcvars64.bat'
 $source=Join-Path $root 'src/Bridge/Bridge.cpp'
 # Fixed compiler arguments and independently quoted paths; this script only builds.
-$command='call "'+$environment+'" >nul && cl /nologo /O2 /W4 /WX /EHsc /MT /guard:cf /LD "'+$source+'" /Fo"'+$output+'\Bridge.obj" /link ole32.lib /DYNAMICBASE /NXCOMPAT /CETCOMPAT /OUT:"'+$output+'\Whatsinthebox.Bridge.dll"'
+$command='call "'+$environment+'" >nul && cl /nologo /O2 /W4 /WX /EHsc /MT /guard:cf /LD "'+$source+'" /Fo"'+$output+'\Bridge.obj" /link ole32.lib uuid.lib /DEF:"'+(Join-Path $root 'src/Bridge/Bridge.def')+'" /DYNAMICBASE /NXCOMPAT /CETCOMPAT /OUT:"'+$output+'\Whatsinthebox.Bridge.dll"'
 & $env:ComSpec /d /s /c $command
 if($LASTEXITCODE -ne 0){throw 'Native bridge compilation failed'}

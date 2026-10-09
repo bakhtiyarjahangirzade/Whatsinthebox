@@ -1,0 +1,4 @@
+LIBRARY Whatsinthebox.Bridge
+EXPORTS
+ DllGetClassObject
+ DllCanUnloadNow

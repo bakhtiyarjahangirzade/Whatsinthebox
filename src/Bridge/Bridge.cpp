@@ -31,7 +31,7 @@ public:
  }
  HRESULT STDMETHODCALLTYPE LockServer(BOOL lock) override{if(lock)InterlockedIncrement(&objects);else InterlockedDecrement(&objects);return S_OK;}
 };
-extern "C" __declspec(dllexport) HRESULT __stdcall DllGetClassObject(REFCLSID clsid,REFIID iid,void** value){
+HRESULT __stdcall DllGetClassObject(REFCLSID clsid,REFIID iid,void** value){
  if(!value)return E_POINTER;
  *value=nullptr;
  if(clsid!=Preview&&clsid!=Thumbnail)return CLASS_E_CLASSNOTAVAILABLE;
@@ -39,4 +39,4 @@ extern "C" __declspec(dllexport) HRESULT __stdcall DllGetClassObject(REFCLSID cl
  if(!factory)return E_OUTOFMEMORY;
  HRESULT result=factory->QueryInterface(iid,value);factory->Release();return result;
 }
-extern "C" __declspec(dllexport) HRESULT __stdcall DllCanUnloadNow(){return objects==0?S_OK:S_FALSE;}
+HRESULT __stdcall DllCanUnloadNow(){return objects==0?S_OK:S_FALSE;}
