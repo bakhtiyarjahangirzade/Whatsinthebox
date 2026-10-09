@@ -43,6 +43,10 @@ jobs:
         if: ${{ !cancelled() }}
         shell: pwsh
         run: ./scripts/run-isolated.ps1 -Script check-installer.ps1
+      - name: Actual Explorer on interactive desktop
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: ./scripts/check-explorer-desktop.ps1
       - name: Five-language installer interface
         if: ${{ !cancelled() }}
         shell: pwsh
