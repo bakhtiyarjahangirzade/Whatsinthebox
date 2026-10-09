@@ -20,9 +20,16 @@ Select a file in Explorer and press **Alt+P**. View its contents without opening
 
 Original proportions are preserved. Fit enlarges small artwork as well as shrinking large pages. PDF pages have previous/next navigation; transparent artwork has checkerboard, light and dark backgrounds. The app window is only a maintenance panel for language, repair and removal.
 
-<p align="center"><img src="docs/screenshots/windows-preview.png" width="360" alt="Actual PDF preview control captured by a Windows integration test"><img src="docs/screenshots/font-preview.png" width="360" alt="Actual font specimen preview"></p>
+### Before → After
 
-The PDF capture is from the 1.0 Windows integration tests. The font image illustrates the specimen renderer.
+The same PDF, without a working preview handler and with Whatsinthebox:
+
+| Before | After · Whatsinthebox |
+|:---:|:---:|
+| <img src="docs/screenshots/no-preview.svg" width="280" alt="Illustration of a PDF with no working preview handler"> | <img src="docs/screenshots/windows-preview.png" width="280" alt="Actual PDF preview captured by the 1.0 Windows integration test"> |
+| A filename, no view inside. | Read the document and move between pages. |
+
+The before panel is an illustration; the after panel is an actual Windows test capture. Existing handlers may already preview some formats.
 
 ## File support
 
