@@ -39,7 +39,7 @@ static class Program
         }
         ApplicationConfiguration.Initialize();
         if(args.Length==2&&args[0]=="--allow-pdf-preview")return PdfPreviewPermission.Prompt(args[1]);
-        if(args.Contains("--windows-host")){try{return WindowsHost.Run();}catch(Exception ex){File.WriteAllText(Path.Combine(PreviewStorage.Root,"host-error.txt"),ex.ToString());return 1;}}
+        if(args.Contains("--windows-host")){try{return WindowsHost.Run(args.Contains("--refresh-existing"));}catch(Exception ex){File.WriteAllText(Path.Combine(PreviewStorage.Root,"host-error.txt"),ex.ToString());return 1;}}
         if(args.Length==3&&args[0]=="--capture")return SelfTest.Capture(args[1],args[2]);
         if(args.Length>=2&&args[0]=="--capture-settings"){using var form=new SettingsForm();form.Show();Application.DoEvents();using var image=new Bitmap(form.Width,form.Height);form.DrawToBitmap(image,new Rectangle(Point.Empty,form.Size));image.Save(args[1]);form.Close();return 0;}
         Application.Run(new SettingsForm());return 0;

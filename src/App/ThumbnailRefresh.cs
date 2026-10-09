@@ -48,25 +48,41 @@ static class ThumbnailRefresh
         try
         {
             if(CoCreateInstance(in CacheClass,IntPtr.Zero,1,in CacheInterface,out cache)<0||SHCreateItemFromParsingName(path,IntPtr.Zero,in ItemInterface,out item)<0)return false;
-            return Method<GetThumbnail>(cache,3)(cache,item,256,1,out shared,out _,out _)>=0;
+            int hr=Method<GetThumbnail>(cache,3)(cache,item,96,1,out shared,out _,out _);return hr>=0;
         }
         finally{if(shared!=IntPtr.Zero)Marshal.Release(shared);if(item!=IntPtr.Zero)Marshal.Release(item);if(cache!=IntPtr.Zero)Marshal.Release(cache);CoUninitialize();}
     }
-    public static int RefreshCommonFolders()
+    public static int RefreshCommonFolders(CancellationToken cancellation=default)
     {
         var until=DateTime.UtcNow.AddSeconds(60);int refreshed=0;
         var folders=new[]{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Downloads"),Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)};
         foreach(var folder in folders.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             if(!Directory.Exists(folder)||folder.StartsWith(@"\\"))continue;
-            string[] files;try{files=Directory.EnumerateFiles(folder).Take(256).ToArray();}catch{continue;}
-            foreach(var path in files)
+            foreach(var path in ExistingFiles(folder,cancellation))
             {
-                if(DateTime.UtcNow>=until)return refreshed;
+                if(cancellation.IsCancellationRequested||DateTime.UtcNow>=until)return refreshed;
                 if(!Extensions.Contains(Path.GetExtension(path).ToLowerInvariant()))continue;
                 try{if((File.GetAttributes(path)&(FileAttributes.Offline|(FileAttributes)0x400000|(FileAttributes)0x40000))!=0)continue;if(IsCached(path)){Refresh(path);refreshed++;}}catch{}
             }
         }
         return refreshed;
+    }
+    static IEnumerable<string> ExistingFiles(string root,CancellationToken cancellation)
+    {
+        var pending=new Queue<(string Path,int Depth)>();pending.Enqueue((root,0));int inspected=0,folders=0;
+        while(pending.Count>0&&inspected<512&&folders++<64&&!cancellation.IsCancellationRequested)
+        {
+            var folder=pending.Dequeue();string[] entries;
+            try{entries=Directory.GetFileSystemEntries(folder.Path).Take(512-inspected).ToArray();}catch{continue;}
+            foreach(string path in entries)
+            {
+                if(cancellation.IsCancellationRequested)yield break;
+                FileAttributes attributes;try{attributes=File.GetAttributes(path);}catch{continue;}
+                if((attributes&(FileAttributes.ReparsePoint|FileAttributes.Offline|(FileAttributes)0x400000|(FileAttributes)0x40000))!=0)continue;
+                if((attributes&FileAttributes.Directory)!=0){if(folder.Depth<2)pending.Enqueue((path,folder.Depth+1));continue;}
+                inspected++;yield return path;if(inspected>=512)yield break;
+            }
+        }
     }
 }

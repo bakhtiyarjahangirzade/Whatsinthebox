@@ -29,7 +29,7 @@ static class WindowsHost
  [DllImport("ole32.dll")]static extern int CoRevokeClassObject(uint cookie);
  [DllImport("ole32.dll")]static extern int CoResumeClassObjects();
  [DllImport("ole32.dll")]static extern int CoInitializeEx(IntPtr reserved,uint mode);
- public static int Run()
+ public static int Run(bool refreshExisting=false)
  {
   using var mutex=new Mutex(true,HostName,out bool created);if(!created)return 0;
   using var stop=new EventWaitHandle(false,EventResetMode.ManualReset,HostName+".stop");
@@ -44,9 +44,15 @@ static class WindowsHost
     try{Marshal.ThrowExceptionForHR(CoRegisterClassObject(in id,unknown,4,5,out uint cookie));cookies.Add(cookie);}finally{Marshal.Release(unknown);}
    }
    Marshal.ThrowExceptionForHR(CoResumeClassObjects());
+   using var maintenanceCancellation=new CancellationTokenSource();
+   if(refreshExisting)
+   {
+    var maintenance=new Thread(()=>{try{int count=ThumbnailRefresh.RefreshCommonFolders(maintenanceCancellation.Token);File.WriteAllText(Path.Combine(Installer.Root,"cache-maintenance.json"),System.Text.Json.JsonSerializer.Serialize(new{refreshed=count,cancelled=maintenanceCancellation.IsCancellationRequested}));}catch{}}){IsBackground=true,Name="Preview cache maintenance"};
+    maintenance.SetApartmentState(ApartmentState.STA);maintenance.Start();
+   }
    _=Updates.CheckAsync();
    var nextUpdate=DateTime.UtcNow.AddHours(24);
-   using var context=new ApplicationContext();using var timer=new System.Windows.Forms.Timer{Interval=500};timer.Tick+=(_,_)=>{if(stop.WaitOne(0))context.ExitThread();if(DateTime.UtcNow>=nextUpdate){nextUpdate=DateTime.UtcNow.AddHours(24);_=Updates.CheckAsync();}};timer.Start();Application.Run(context);return 0;
+   using var context=new ApplicationContext();using var timer=new System.Windows.Forms.Timer{Interval=500};timer.Tick+=(_,_)=>{if(stop.WaitOne(0)){maintenanceCancellation.Cancel();context.ExitThread();}if(DateTime.UtcNow>=nextUpdate){nextUpdate=DateTime.UtcNow.AddHours(24);_=Updates.CheckAsync();}};timer.Start();try{Application.Run(context);}finally{maintenanceCancellation.Cancel();}return 0;
   }
   finally{foreach(uint cookie in cookies)CoRevokeClassObject(cookie);HostDispatcher.Anchor=null;GC.KeepAlive(factories);}
  }

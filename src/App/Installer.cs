@@ -86,7 +86,7 @@ static class Installer
                 startup.SetValue("Whatsinthebox",$"\"{Path.Combine(bin,"Whatsinthebox.exe")}\" --windows-host");
             }
             WindowsHost.Stop();Thread.Sleep(600);
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Path.Combine(bin,"Whatsinthebox.exe"),"--windows-host"){UseShellExecute=false,CreateNoWindow=true,WindowStyle=System.Diagnostics.ProcessWindowStyle.Hidden});
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Path.Combine(bin,"Whatsinthebox.exe"),"--windows-host --refresh-existing"){UseShellExecute=false,CreateNoWindow=true,WindowStyle=System.Diagnostics.ProcessWindowStyle.Hidden});
         }
         catch{Uninstall();throw;}
     }
