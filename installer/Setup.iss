@@ -13,9 +13,9 @@ AppPublisher=Whatsinthebox contributors
 DefaultDirName={localappdata}\Whatsinthebox\app
 DefaultGroupName=Whatsinthebox
 PrivilegesRequired=lowest
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
-MinVersion=10.0
+ArchitecturesAllowed=x64os
+ArchitecturesInstallIn64BitMode=x64os
+MinVersion=10.0.14393
 OutputDir=..\artifacts\installer
 OutputBaseFilename=Whatsinthebox-{#AppVersion}-Setup
 SetupIconFile=..\src\App\app.ico
@@ -165,6 +165,22 @@ var
   MaintenancePage: TInputOptionWizardPage;
   InstalledExe, InstalledVersion, InstalledRoot, BinaryFolder: String;
   InstalledComparison: Integer;
+  InstalledExists: Boolean;
+
+function VersionValue(Value: String): Int64;
+var Parts: array[0..3] of Integer; I, Dot: Integer; Segment: String;
+begin
+  Result := -1;
+  for I := 0 to 3 do begin
+    Dot := Pos('.', Value);
+    if Dot = 0 then begin Segment := Value; Value := ''; end
+    else begin Segment := Copy(Value, 1, Dot - 1); Delete(Value, 1, Dot); end;
+    if Segment = '' then Parts[I] := 0 else Parts[I] := StrToIntDef(Segment, -1);
+    if (Parts[I] < 0) or (Parts[I] > 65535) then Exit;
+  end;
+  if Value <> '' then Exit;
+  Result := PackVersionNumbers((Cardinal(Parts[0]) shl 16) or Cardinal(Parts[1]), (Cardinal(Parts[2]) shl 16) or Cardinal(Parts[3]));
+end;
 
 function InstallBin(Value: String): String;
 begin
@@ -172,9 +188,9 @@ begin
 end;
 
 procedure DetectInstalled;
-var Found: TFindRec; VersionMS, VersionLS: Cardinal; Packed, Best: Int64; RegisteredRoot, RegisteredIcon: String;
+var Found: TFindRec; VersionMS, VersionLS: Cardinal; Packed, Best: Int64; RegisteredRoot, RegisteredIcon, RegisteredVersion: String;
 begin
-  InstalledExe := ''; InstalledVersion := ''; Best := -1;
+  InstalledExe := ''; InstalledVersion := ''; Best := -1; InstalledExists := False;
 #ifdef QA_LAYOUT
   Exit;
 #endif
@@ -204,6 +220,12 @@ begin
   end;
   if InstalledExe <> '' then begin
     GetVersionNumbersString(InstalledExe, InstalledVersion);
+  end else if RegQueryStringValue(HKCU64, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{1B978517-80B7-49E9-AE4F-F83A9844F190}_is1', 'DisplayVersion', RegisteredVersion) then begin
+    Best := VersionValue(RegisteredVersion);
+    if Best <> -1 then InstalledVersion := RegisteredVersion;
+  end;
+  InstalledExists := Best <> -1;
+  if InstalledExists then begin
     InstalledComparison := ComparePackedVersion(Best, {#StrToVersion(AppVersion)});
     Log('Detected installation: ' + InstalledVersion + '; setup: {#AppVersion}; comparison: ' + IntToStr(InstalledComparison));
   end;
@@ -222,7 +244,7 @@ begin
  DetectInstalled;
  WizardForm.Font.Name := 'Tahoma';
  if ActiveLanguage = 'zh' then WizardForm.Font.Name := 'Microsoft YaHei UI';
- if InstalledExe <> '' then begin
+ if InstalledExists then begin
    MaintenancePage := CreateInputOptionPage(wpWelcome, CustomMessage('setup_existing'),
      FmtMessage(CustomMessage('setup_versions'), [InstalledVersion, '{#AppVersion}']),
      CustomMessage('setup_choose'), True, False);
@@ -278,7 +300,7 @@ begin
   Exit;
 #endif
   DetectInstalled;
-  if (InstalledExe <> '') and (InstalledComparison > 0) then begin
+  if InstalledExists and (InstalledComparison > 0) then begin
     Result := CustomMessage('setup_newer'); Exit;
   end;
   ExtractTemporaryFile('StopHelper.ps1');
@@ -288,13 +310,14 @@ begin
     Result := CustomMessage('setup_stop_failed'); Exit;
   end;
   RepairRequested := False;
-  if InstalledExe <> '' then begin
+  if InstalledExists then begin
     RepairRequested := InstalledComparison = 0;
     if MaintenancePage <> nil then
       if MaintenancePage.SelectedValueIndex = 1 then RepairRequested := True;
   end;
   if RepairRequested then begin
-    if not Exec(InstalledExe, '--unregister', ExtractFileDir(InstalledExe), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then begin
+    ExtractTemporaryFile('Whatsinthebox.exe');
+    if not Exec(ExpandConstant('{tmp}\Whatsinthebox.exe'), '--unregister', ExpandConstant('{tmp}'), SW_HIDE, ewWaitUntilTerminated, Code) or (Code <> 0) then begin
       Result := CustomMessage('setup_uninstall_failed'); Exit;
     end;
   end;

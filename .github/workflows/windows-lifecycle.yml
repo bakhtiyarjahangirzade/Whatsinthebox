@@ -1,11 +1,19 @@
 name: Windows lifecycle
 on:
   workflow_dispatch:
+    inputs:
+      image:
+        description: Windows verification image
+        type: choice
+        default: windows-2025
+        options:
+          - windows-2025
+          - windows-2022
 permissions:
   contents: read
 jobs:
   lifecycle:
-    runs-on: windows-latest
+    runs-on: ${{ inputs.image }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4

@@ -62,6 +62,10 @@ try {
    Install 'same-version-repair' $setup
    Assert 'repair uses a fresh binary directory' ((InstalledExe) -ne $before)
    Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}')
+   $missing=InstalledExe
+   Move-Item -LiteralPath $missing -Destination ($missing+'.test-backup')
+   try{Install 'missing-executable-repair' $setup;Assert 'repair recovers missing executable' (Test-Path -LiteralPath (InstalledExe))}
+   finally{Move-Item -LiteralPath ($missing+'.test-backup') -Destination $missing}
    Run 'disable-integration' (InstalledExe) @('--unregister')
    Install 'disabled-repair' $setup 'en' $false
    Assert 'repair preserves disabled integration' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
@@ -83,7 +87,7 @@ try {
  Assert 'only one startup helper' ($helpers.Count -le 1)
  RemoveInstall 'remove-upgraded-install'
  $events=@(Get-WinEvent -FilterHashtable @{LogName='Application';Id=1000,1001;StartTime=$started} -ErrorAction SilentlyContinue | Where-Object {$_.Message -match '(?i)Whatsinthebox|explorer.exe|StartMenuExperienceHost|ShellExperienceHost'})
- $events | Select-Object TimeCreated,Id,Message | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $evidence 'application-events.json')
+ ConvertTo-Json -InputObject @($events | Select-Object TimeCreated,Id,Message) -Depth 5 | Set-Content (Join-Path $evidence 'application-events.json')
  Assert 'no application or shell crash events during installer journeys' ($events.Count -eq 0)
 }finally {
  $results | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $evidence 'installer-summary.json')
