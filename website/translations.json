@@ -12,7 +12,7 @@
     "twoBody": "Original proportions, transparent backgrounds and PDF page navigation.",
     "threeTitle": "Your files stay yours.",
     "threeBody": "Files stay on your computer. No uploads, ads or subscriptions.",
-    "limits": "Beta, unsigned. PSD uses saved composites; CDR needs an embedded preview. Some file variants are unsupported.",
+    "limits": "Unsigned installer: Windows may show a publisher warning. PSD uses saved composites; CDR needs an embedded preview.",
     "source": "Source code ↗",
     "security": "Security & checks ↗",
     "formats": "Formats",
@@ -27,9 +27,9 @@
     "designDescription": "Saved Photoshop composites; embedded previews for compatible CorelDRAW files.",
     "imageDescription": "Vector artwork, images and transparent backgrounds with original proportions.",
     "fontDescription": "Font specimens without installing the font.",
-    "status": "1.0 release · under verification",
+    "status": "1.0.0 · available now",
     "releaseTitle": "A useful feature.<br>A careful release.",
-    "releaseBody": "Upgrade, repair, removal and Explorer stability are being checked. A Windows shell issue remains under investigation. The 1.0 download will be published after these checks pass.",
+    "releaseBody": "The self-contained installer passed install, upgrade, repair, removal and native Windows preview checks in two isolated Windows environments. One download, five languages, no separate runtime installation.",
     "releaseAside": "No silent updates.<br>No accounts.<br>No file uploads.",
     "faqTitle": "Before you install.",
     "faq1": "Does it upload my files?",
@@ -37,7 +37,7 @@
     "faq2": "Why might a PDF preview be blocked?",
     "faq2Answer": "Windows can block downloaded files before invoking a preview handler. A per-file permission action is available for PDFs you trust. Protected and damaged files may need separate handling.",
     "faq3": "Can I remove it cleanly?",
-    "faq3Answer": "The uninstaller restores the preview registrations it replaced. Clean install, upgrade, repair and removal must pass before 1.0."
+    "faq3Answer": "Yes. The uninstaller restores the preview registrations it replaced. Clean install, update, repair and removal passed the 1.0 verification."
   },
   "tr": {
     "eyebrow": "Windows için küçük bir dokunuş.",
@@ -52,7 +52,7 @@
     "twoBody": "Orijinal oranlar, saydam arka planlar ve PDF sayfaları arasında gezinme.",
     "threeTitle": "Dosyaların sana ait.",
     "threeBody": "Dosyalar bilgisayarında kalır. Yükleme, reklam ve abonelik yok.",
-    "limits": "İmzasız beta. PSD kayıtlı birleşik görseli, CDR gömülü önizlemeyi kullanır. Bazı dosya türleri desteklenmez.",
+    "limits": "Setup dijital imzasız; Windows yayıncı uyarısı gösterebilir. PSD kaydedilmiş birleşik görüntüyü, CDR gömülü önizlemeyi kullanır.",
     "source": "Kaynak kodu ↗",
     "security": "Güvenlik ve kontroller ↗",
     "formats": "Formatlar",
@@ -67,9 +67,9 @@
     "designDescription": "Photoshop için kayıtlı birleşik görüntü; uyumlu CorelDRAW dosyalarında gömülü önizleme.",
     "imageDescription": "Vektörler, görseller ve şeffaf arka planlar; orijinal oranlarıyla.",
     "fontDescription": "Fontu kurmadan yazı tipi örnekleri.",
-    "status": "1.0 sürümü · doğrulama aşamasında",
+    "status": "1.0.0 · şimdi indirilebilir",
     "releaseTitle": "Faydalı bir özellik.<br>Özenli bir sürüm.",
-    "releaseBody": "Güncelleme, onarım, kaldırma ve Gezgin kararlılığı kontrol ediliyor. Windows kabuğundaki bir sorun araştırılıyor. 1.0 indirmesi bu kontroller geçince yayımlanacak.",
+    "releaseBody": "Bağımsız setup; kurulum, güncelleme, onarım, kaldırma ve yerel Windows önizleme testlerini iki yalıtılmış Windows ortamında geçti. Tek indirme, beş dil; ayrı çalışma bileşeni kurulumu gerekmiyor.",
     "releaseAside": "Sessiz güncelleme yok.<br>Hesap yok.<br>Dosya yükleme yok.",
     "faqTitle": "Kurmadan önce.",
     "faq1": "Dosyalarımı internete yükler mi?",
@@ -77,7 +77,7 @@
     "faq2": "PDF önizlemesi neden engellenebilir?",
     "faq2Answer": "Windows, indirilmiş dosyaları önizleyiciye ulaşmadan engelleyebilir. Güvendiğin PDF için dosyaya özel izin işlemi vardır. Korumalı veya bozuk dosyalar ayrı işlem gerektirebilir.",
     "faq3": "Temiz şekilde kaldırabilir miyim?",
-    "faq3Answer": "Kaldırıcı, değiştirdiği önizleme kayıtlarını geri yükler. 1.0 öncesinde temiz kurulum, güncelleme, onarım ve kaldırma testleri geçmelidir."
+    "faq3Answer": "Evet. Kaldırma işlemi önceki önizleyici kayıtlarını geri yükler. Temiz kurulum, güncelleme, onarım ve kaldırma 1.0 testlerini geçti."
   },
   "de": {
     "eyebrow": "Ein kleines Upgrade für Windows.",
@@ -92,7 +92,7 @@
     "twoBody": "Originale Proportionen, transparente Hintergründe und PDF-Seitennavigation.",
     "threeTitle": "Ihre Dateien bleiben Ihre.",
     "threeBody": "Dateien bleiben auf Ihrem Computer. Keine Uploads, Werbung oder Abos.",
-    "limits": "Unsignierte Beta. PSD nutzt gespeicherte Gesamtbilder; CDR benötigt eingebettete Vorschauen. Einige Varianten werden nicht unterstützt.",
+    "limits": "Installer ohne digitale Signatur: Windows kann eine Herausgeberwarnung anzeigen. PSD nutzt gespeicherte Gesamtbilder; CDR benötigt eine eingebettete Vorschau.",
     "source": "Quellcode ↗",
     "security": "Sicherheit & Prüfungen ↗",
     "formats": "Formate",
@@ -107,9 +107,9 @@
     "designDescription": "Gespeicherte Photoshop-Kompositionen; eingebettete Vorschauen kompatibler CorelDRAW-Dateien.",
     "imageDescription": "Vektorgrafik, Bilder und Transparenz mit ursprünglichen Proportionen.",
     "fontDescription": "Schriftproben ohne Installation der Schrift.",
-    "status": "Version 1.0 · wird geprüft",
+    "status": "1.0.0 · jetzt verfügbar",
     "releaseTitle": "Eine nützliche Funktion.<br>Eine sorgfältige Veröffentlichung.",
-    "releaseBody": "Update, Reparatur, Entfernung und Explorer-Stabilität werden geprüft. Ein Windows-Shell-Problem wird untersucht. Version 1.0 erscheint nach erfolgreichen Prüfungen.",
+    "releaseBody": "Der eigenständige Installer hat Installation, Update, Reparatur, Entfernung und native Windows-Vorschau in zwei isolierten Windows-Umgebungen bestanden. Ein Download, fünf Sprachen, keine separate Laufzeitinstallation.",
     "releaseAside": "Keine stillen Updates.<br>Keine Konten.<br>Keine Datei-Uploads.",
     "faqTitle": "Vor der Installation.",
     "faq1": "Werden meine Dateien hochgeladen?",
@@ -117,7 +117,7 @@
     "faq2": "Warum kann die PDF-Vorschau blockiert sein?",
     "faq2Answer": "Windows kann Downloads vor dem Aufruf des Vorschauhandlers blockieren. Für vertrauenswürdige PDFs gibt es eine Freigabe pro Datei. Geschützte und beschädigte Dateien brauchen eine eigene Lösung.",
     "faq3": "Kann ich die Anwendung sauber entfernen?",
-    "faq3Answer": "Die Deinstallation stellt vorherige Vorschauregistrierungen wieder her. Installation, Update, Reparatur und Entfernung müssen vor Version 1.0 erfolgreich geprüft werden."
+    "faq3Answer": "Ja. Die Deinstallation stellt die vorherigen Vorschau-Registrierungen wieder her. Installation, Update, Reparatur und Entfernung haben die Prüfung für 1.0 bestanden."
   },
   "ru": {
     "eyebrow": "Небольшое улучшение для Windows.",
@@ -132,7 +132,7 @@
     "twoBody": "Исходные пропорции, прозрачный фон и переход по страницам PDF.",
     "threeTitle": "Ваши файлы остаются вашими.",
     "threeBody": "Файлы остаются на компьютере. Без загрузок, рекламы и подписок.",
-    "limits": "Бета без цифровой подписи. PSD использует сохранённый композит; CDR требует встроенного превью. Некоторые варианты не поддерживаются.",
+    "limits": "Установщик без цифровой подписи: Windows может показать предупреждение. PSD использует сохранённое изображение; CDR требует встроенного предпросмотра.",
     "source": "Исходный код ↗",
     "security": "Безопасность и проверки ↗",
     "formats": "Форматы",
@@ -147,9 +147,9 @@
     "designDescription": "Сохранённые композиции Photoshop; встроенные изображения совместимых файлов CorelDRAW.",
     "imageDescription": "Векторная графика, изображения и прозрачность с исходными пропорциями.",
     "fontDescription": "Образцы шрифта без его установки.",
-    "status": "Версия 1.0 · проходит проверку",
+    "status": "1.0.0 · доступна",
     "releaseTitle": "Полезная функция.<br>Продуманный выпуск.",
-    "releaseBody": "Проверяются обновление, восстановление, удаление и стабильность Проводника. Исследуется проблема оболочки Windows. Версия 1.0 появится после успешных проверок.",
+    "releaseBody": "Автономный установщик прошёл проверки установки, обновления, восстановления, удаления и предпросмотра в двух изолированных средах Windows. Одна загрузка, пять языков, без отдельной установки среды выполнения.",
     "releaseAside": "Без скрытых обновлений.<br>Без аккаунтов.<br>Без загрузки файлов.",
     "faqTitle": "Перед установкой.",
     "faq1": "Загружаются ли мои файлы в интернет?",
@@ -157,7 +157,7 @@
     "faq2": "Почему предпросмотр PDF может блокироваться?",
     "faq2Answer": "Windows может блокировать загруженные файлы до вызова обработчика. Для доверенных PDF есть разрешение для одного файла. Защищённые и повреждённые файлы требуют отдельного решения.",
     "faq3": "Можно ли полностью удалить программу?",
-    "faq3Answer": "Удаление восстанавливает прежние регистрации предпросмотра. До версии 1.0 должны пройти проверки установки, обновления, восстановления и удаления."
+    "faq3Answer": "Да. Удаление восстанавливает прежние обработчики предпросмотра. Установка, обновление, восстановление и удаление прошли проверки версии 1.0."
   },
   "zh": {
     "eyebrow": "为 Windows 增添一点便利。",
@@ -172,7 +172,7 @@
     "twoBody": "原始比例、透明背景和 PDF 页面导航。",
     "threeTitle": "文件始终属于你。",
     "threeBody": "文件留在你的电脑上。无需上传，没有广告或订阅。",
-    "limits": "未签名测试版。PSD 使用已保存的合成图；CDR 需要内嵌预览。部分文件变体不受支持。",
+    "limits": "安装包未签名，Windows 可能显示发布者提示。PSD 使用已保存的合成图像，CDR 需要内嵌预览。",
     "source": "源代码 ↗",
     "security": "安全与检查 ↗",
     "formats": "文件格式",
@@ -187,9 +187,9 @@
     "designDescription": "Photoshop 已保存的合成图；兼容 CorelDRAW 文件的内嵌预览。",
     "imageDescription": "矢量图、图片与透明背景，保留原始比例。",
     "fontDescription": "无需安装字体即可查看字体样张。",
-    "status": "1.0 版本 · 正在验证",
+    "status": "1.0.0 · 现已发布",
     "releaseTitle": "实用的功能。<br>审慎的发布。",
-    "releaseBody": "正在验证更新、修复、卸载及资源管理器稳定性。一个 Windows 外壳问题仍在调查中。测试通过后才会发布 1.0 下载。",
+    "releaseBody": "独立安装包已在两个隔离的 Windows 环境中通过安装、更新、修复、卸载及原生预览测试。一次下载，五种语言，无需另行安装运行时。",
     "releaseAside": "没有静默更新。<br>不需要账户。<br>不上传文件。",
     "faqTitle": "安装前了解。",
     "faq1": "会上传我的文件吗？",
@@ -197,6 +197,6 @@
     "faq2": "为什么 PDF 预览会被阻止？",
     "faq2Answer": "Windows 可能在调用预览处理程序前阻止下载的文件。可信 PDF 可以单独授权。受保护或损坏的文件可能需要其他处理。",
     "faq3": "可以干净地卸载吗？",
-    "faq3Answer": "卸载程序会恢复被替换的预览注册信息。1.0 发布前必须通过安装、更新、修复和卸载测试。"
+    "faq3Answer": "可以。卸载程序会恢复原有预览注册信息。安装、更新、修复及卸载均已通过 1.0 验证。"
   }
 }

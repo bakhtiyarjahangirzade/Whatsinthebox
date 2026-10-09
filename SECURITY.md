@@ -2,7 +2,7 @@
 
 Report suspected vulnerabilities through GitHub private vulnerability reporting when available. Do not publish exploit details, credentials or private sample files in an issue.
 
-There is currently no approved 1.0 release. A Windows shell stability report is under investigation; release checks are tracked in [docs/verification.md](docs/verification.md).
+The 1.0 installer and native bridge passed the automated Windows checks documented in [docs/verification.md](docs/verification.md). The installer is unsigned; verify the SHA256 published with the release. A checksum identifies a file and does not replace an Authenticode signature.
 
 Native decoders handle complex, untrusted file formats. A separate process and input/time limits reduce impact, but do not provide a complete operating-system sandbox. Keep Windows and the .NET Desktop Runtime updated. A clean advisory scan does not establish that a build has no vulnerabilities.
 

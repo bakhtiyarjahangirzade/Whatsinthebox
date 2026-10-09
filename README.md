@@ -3,14 +3,16 @@
  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-187dbd?style=flat-square" alt="MIT license"></a>
  <img src="https://img.shields.io/badge/platform-Windows_x64-253f56?style=flat-square" alt="Windows x64">
  <a href="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/workflows/checks.yml"><img src="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/workflows/checks.yml/badge.svg" alt="Build and checks"></a>
- <a href="docs/verification.md"><img src="https://img.shields.io/badge/1.0-release_verification-c18a39?style=flat-square" alt="1.0 release verification"></a>
+ <a href="https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/release-1.0.0-187dbd?style=flat-square" alt="Release 1.0.0"></a>
 </p>
 <p align="center"><strong>Local file previews, right where your files live.</strong><br>PDFs, artwork, images and fonts. Free and open source.</p>
-<p align="center"><a href="https://whatsinthebox-alpha.vercel.app">Website</a> · <a href="#how-it-works">How it works</a> · <a href="#file-support">File support</a> · <a href="docs/verification.md">Release checks</a> · <a href="CONTRIBUTING.md">Build from source</a></p>
+<p align="center"><a href="https://whatsinthebox-app.vercel.app">Website</a> · <a href="#how-it-works">How it works</a> · <a href="#file-support">File support</a> · <a href="docs/verification.md">Release checks</a> · <a href="CONTRIBUTING.md">Build from source</a></p>
 
 ## Release status
 
-**1.0 is being verified, not released.** A Windows shell incident remains under investigation. The installer lifecycle has been revised, but real Explorer and clean-install/update/repair/removal tests must pass before a stable download is published. Older beta packages are not evidence that these checks passed. [See the release checklist →](docs/verification.md)
+**[Download Whatsinthebox 1.0.0 for Windows x64 →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v1.0.0/Whatsinthebox-1.0.0-Setup.exe)**
+
+One installer, five languages, no separate runtime installation and no administrator requirement. Existing installations offer update or repair; removal restores the handlers that were replaced. The installer is unsigned, so Windows may show a publisher warning. [Verification and checksums →](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/tag/v1.0.0)
 
 ## How it works
 
@@ -20,7 +22,7 @@ Original proportions are preserved. Fit enlarges small artwork as well as shrink
 
 <p align="center"><img src="docs/screenshots/windows-preview.png" width="360" alt="Actual PDF preview control captured by a Windows integration test"><img src="docs/screenshots/font-preview.png" width="360" alt="Actual font specimen preview"></p>
 
-These are real captures of the preview control from earlier integration tests, not proof that the current release candidate passed Explorer testing.
+The PDF capture is from the 1.0 Windows integration tests. The font image illustrates the specimen renderer.
 
 ## File support
 
@@ -52,11 +54,12 @@ Updates preserve settings. A disabled Windows integration stays deselected. The 
 
 <p align="center"><img src="docs/screenshots/setup-finish.png" width="500" alt="Classic installer completion with the author portrait"></p>
 
-The classic wizard uses the author portrait and an optional, initially checked link to this repository. Silent setup does not open a browser. The screenshot above predates the new maintenance page.
+The classic wizard uses the author portrait and an optional, initially checked link to this repository. Silent setup does not open a browser. The screenshot is from the five-language 1.0 installer verification.
 
 ## Privacy and safety
 
 - Rendering stays on your computer. No document uploads, accounts, advertising or telemetry.
+- Explorer loads a small native bridge. Managed rendering and UI run in a separate application process.
 - Update checks read public GitHub release metadata; updates are not installed automatically.
 - Windows may block downloaded PDFs before invoking the handler. A per-file permission action asks for consent before removing the selected PDF's download mark.
 - The renderer has input/time limits and runs separately. It is not a complete OS sandbox, and no scan guarantees zero vulnerabilities.
