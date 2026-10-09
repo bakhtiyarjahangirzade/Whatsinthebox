@@ -24,8 +24,20 @@ static class Installer
             if(previous!=null||previousThumbnail!=null)Uninstall();
         Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app",Updates.Current.ToString());Directory.CreateDirectory(bin);
         if(!Path.GetFullPath(source).TrimEnd('\\').Equals(Path.GetFullPath(bin).TrimEnd('\\'),StringComparison.OrdinalIgnoreCase))foreach(var file in Directory.EnumerateFiles(source,"*",SearchOption.AllDirectories)){var target=Path.Combine(bin,Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
+        string[] nativeImages={".png",".jpg",".jpeg",".bmp",".gif",".tif",".tiff"};
+        var nativePreviewPaths=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var nativeProgIds=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach(var ext in nativeImages)
+        {
+            nativePreviewPaths.Add($@"Software\Classes\{ext}\shellex\{IntegrationIds.PreviewInterface}");
+            nativePreviewPaths.Add($@"Software\Classes\SystemFileAssociations\{ext}\shellex\{IntegrationIds.PreviewInterface}");
+            using var choice=Registry.CurrentUser.OpenSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}\UserChoice");
+            using var type=Registry.ClassesRoot.OpenSubKey(ext);
+            foreach(var progId in new[]{choice?.GetValue("ProgId") as string,type?.GetValue("") as string}.Where(x=>!string.IsNullOrWhiteSpace(x)))
+            {nativeProgIds.Add(progId!);nativePreviewPaths.Add($@"Software\Classes\{progId}\shellex\{IntegrationIds.PreviewInterface}");}
+        }
         var targets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
-        foreach(var ext in SupportedFiles.All)AddTargets(ext,IntegrationIds.PreviewInterface,IntegrationIds.Preview);
+        foreach(var ext in SupportedFiles.All.Except(nativeImages))AddTargets(ext,IntegrationIds.PreviewInterface,IntegrationIds.Preview);
         foreach(var ext in SupportedFiles.ImageExtensions.Concat(new[]{".pdf",".ai"}))AddTargets(ext,IntegrationIds.ThumbnailInterface,IntegrationIds.Thumbnail);
         foreach(var ext in ThumbnailRefresh.Extensions)
         {
@@ -42,11 +54,20 @@ static class Installer
             targets[$@"Software\Classes\SystemFileAssociations\{ext}\shellex\{iid}"]=clsid;
             using var choice=Registry.CurrentUser.OpenSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}\UserChoice");
             using var fileType=Registry.ClassesRoot.OpenSubKey(ext);
-            foreach(var progId in new[]{choice?.GetValue("ProgId") as string,fileType?.GetValue("") as string}.Where(x=>!string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
+            foreach(var progId in new[]{choice?.GetValue("ProgId") as string,fileType?.GetValue("") as string}.Where(x=>!string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).Where(x=>iid!=IntegrationIds.PreviewInterface||!nativeProgIds.Contains(x!)))
                 targets[$@"Software\Classes\{progId}\shellex\{iid}"]=clsid;
         }
         string legacyFile=Path.Combine(Root,"associations.json");var legacy=File.Exists(legacyFile)?JsonSerializer.Deserialize<Dictionary<string,string?>>(File.ReadAllText(legacyFile))!:new();
         var backups=File.Exists(BackupFile)?JsonSerializer.Deserialize<List<Snapshot>>(File.ReadAllText(BackupFile))!:new();
+        // Windows already owns the common image preview. Retire our old overrides
+        // while preserving any registration the user changed after installation.
+        foreach(var snapshot in backups.Where(x=>nativePreviewPaths.Contains(x.Path)).ToArray())
+        {
+            using var key=Registry.CurrentUser.OpenSubKey(snapshot.Path,true);
+            if(key?.GetValue("") as string==snapshot.Installed)
+            {if(snapshot.Original!=null)key.SetValue("",snapshot.Original,snapshot.Kind);else key.DeleteValue("",false);}
+            backups.Remove(snapshot);
+        }
         foreach(var pair in targets)
         {
             if(backups.Any(x=>x.Path.Equals(pair.Key,StringComparison.OrdinalIgnoreCase)))continue;

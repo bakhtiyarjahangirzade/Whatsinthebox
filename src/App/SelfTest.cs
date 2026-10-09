@@ -38,6 +38,13 @@ static class SelfTest
             {
                 string path=Path.Combine(root,"extended"+ext);try{using var image=new ImageMagick.MagickImage(ImageMagick.MagickColors.CornflowerBlue,160,90);image.Write(path,Renderer.RasterFormats[ext]);Check("extended "+ext,path,true);}catch(Exception ex){failed++;results.Add(new{name="extended "+ext,passed=false,error=ex.Message});}
             }
+            string largePdf=Path.Combine(root,"large-seekable.pdf");byte[] basePdf=MakePdf();string baseText=System.Text.Encoding.ASCII.GetString(basePdf);int startMarker=baseText.LastIndexOf("startxref",StringComparison.Ordinal);string previousXref=baseText[(startMarker+9)..].Trim().Split('\n')[0].Trim();
+            using(var large=File.Create(largePdf))
+            {
+                large.Write(basePdf);long unusedOffset=large.Position;byte[] prefix=System.Text.Encoding.ASCII.GetBytes("\n99 0 obj\n<< /Length 300000000 >>\nstream\n");large.Write(prefix);large.Seek(300000000,SeekOrigin.Current);large.Write(System.Text.Encoding.ASCII.GetBytes("\nendstream\nendobj\n"));long xref=large.Position;
+                large.Write(System.Text.Encoding.ASCII.GetBytes($"xref\n99 1\n{unusedOffset+1:0000000000} 00000 n \ntrailer\n<< /Size 100 /Root 1 0 R /Prev {previousXref} >>\nstartxref\n{xref}\n%%EOF\n"));
+            }
+            Check("Large seekable PDF renders without copying the entire file",largePdf,true,"PDF");
             string text=Path.Combine(root,"example.md");File.WriteAllText(text,"# Yerel önizleme\nDosya içeriği burada.\n"+string.Join('\n',Enumerable.Range(1,120).Select(i=>$"Satır {i}")));Check("text pages",text,true,"Metin",1,3);
             string word=Path.Combine(root,"sample.docx");using(var zip=ZipFile.Open(word,ZipArchiveMode.Create)){using var writer=new StreamWriter(zip.CreateEntry("word/document.xml").Open());writer.Write("<document><body><p><r><t>Merhaba Whatsinthebox</t></r></p></body></document>");}Check("DOCX text fixture",word,true,"DOCX");
             string sheet=Path.Combine(root,"sample.xlsx");using(var zip=ZipFile.Open(sheet,ZipArchiveMode.Create)){using var writer=new StreamWriter(zip.CreateEntry("xl/worksheets/sheet1.xml").Open());writer.Write("<worksheet><sheetData><row><c r='A1' t='inlineStr'><is><t>Ürün</t></is></c><c r='B1'><v>42</v></c></row></sheetData></worksheet>");}Check("XLSX values fixture",sheet,true,"XLSX");

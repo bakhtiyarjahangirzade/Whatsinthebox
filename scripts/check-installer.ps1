@@ -58,6 +58,11 @@ try {
   Run ('settings-'+$language) $exe @('--capture-settings',('"'+(Join-Path $evidence ('settings-'+$language+'.png'))+'"'),'--locale',$language)
   Assert ($language+' settings screenshot') ((Get-Item (Join-Path $evidence ('settings-'+$language+'.png'))).Length -gt 1000)
   if($language -eq 'en'){
+   foreach($imageExtension in '.png','.jpg','.jpeg'){
+    $imagePreview='HKCU:\Software\Classes\'+$imageExtension+'\shellex\{8895b1c6-b41f-4c1c-a562-0d564250836f}'
+    $imageHandler=if(Test-Path -LiteralPath $imagePreview){(Get-Item -LiteralPath $imagePreview).GetValue('')}else{$null}
+    Assert ($imageExtension+' native preview preserved') ($imageHandler -ne '{EAAC2037-3EB7-4D93-8716-1B6A269C0358}')
+   }
    $before=InstalledExe
    Install 'same-version-repair' $setup
    Assert 'repair uses a fresh binary directory' ((InstalledExe) -ne $before)

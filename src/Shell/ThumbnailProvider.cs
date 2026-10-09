@@ -15,7 +15,7 @@ public sealed class ThumbnailProvider : IThumbnailProvider,IInitializeWithStream
  public void Initialize(string path,uint mode){file=path;}
  public void Initialize(IStream stream,uint mode)
  {
-  stream.Stat(out var stat,0);if(stat.cbSize>256L*1024*1024)throw new IOException(L.T("input.limit"));
+  stream.Stat(out var stat,0);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new IOException(L.T("input.limit"));
   string extension=Path.GetExtension(stat.pwcsName??"").ToLowerInvariant();if(!SupportedFiles.All.Contains(extension))extension=".witb";
   temp=Path.Combine(PreviewStorage.Root,Guid.NewGuid().ToString("N")+extension);
   using var output=File.Create(temp);var buffer=new byte[65536];var count=Marshal.AllocCoTaskMem(4);
@@ -31,7 +31,7 @@ public sealed class ThumbnailProvider : IThumbnailProvider,IInitializeWithStream
    string exe=HostActivity.Renderer(typeof(ThumbnailProvider).Assembly);
    using var worker=new Process{StartInfo=new ProcessStartInfo(exe){UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden}};
    foreach(var arg in new[]{"--render",file,png,json})worker.StartInfo.ArgumentList.Add(arg);
-   worker.Start();if(!worker.WaitForExit(15000)){worker.Kill(true);worker.WaitForExit();throw new TimeoutException(L.T("thumbnail.timeout"));}
+   worker.Start();using var limits=WorkerLimits.Attach(worker);if(!worker.WaitForExit(15000)){worker.Kill(true);worker.WaitForExit();throw new TimeoutException(L.T("thumbnail.timeout"));}
    if(!File.Exists(json)||JsonSerializer.Deserialize<RenderInfo>(File.ReadAllText(json))?.Success!=true)throw new IOException(L.T("thumbnail.failed"));
    using var source=Image.FromFile(png);int size=(int)Math.Clamp(edge,1,1024);var dimensions=PreviewGeometry.Fit(source.Width,source.Height,size,size,true);int width=dimensions.Width,height=dimensions.Height;
    using var image=new Bitmap(width,height);using(var g=Graphics.FromImage(image)){g.Clear(Color.White);g.InterpolationMode=System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;g.DrawImage(source,0,0,width,height);}bitmap=image.GetHbitmap();

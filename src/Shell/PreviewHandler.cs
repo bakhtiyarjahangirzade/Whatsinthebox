@@ -21,7 +21,7 @@ public sealed class PreviewHandler : IPreviewHandler,IInitializeWithFile,IInitia
     public void Initialize(string path,uint mode){file=path;}
     public void Initialize(IStream stream,uint mode)
     {
-        stream.Stat(out var stat,0);if(stat.cbSize>256L*1024*1024)throw new COMException(L.T("input.limit"),unchecked((int)0x800700DF));
+        stream.Stat(out var stat,0);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new COMException(L.T("input.limit"),unchecked((int)0x800700DF));
         string suffix=Path.GetExtension(stat.pwcsName??"").ToLowerInvariant();if(!SupportedFiles.All.Contains(suffix))suffix=".witb";
         var root=PreviewStorage.Root;temp=Path.Combine(root,Guid.NewGuid().ToString("N")+suffix);
         using var output=File.Create(temp);var buffer=new byte[65536];IntPtr read=Marshal.AllocCoTaskMem(4);

@@ -74,7 +74,7 @@ public sealed class PreviewControl : UserControl
             string png=Path.Combine(dir,"preview.png"), json=Path.Combine(dir,"result.json");
             using var process=new Process {StartInfo=new ProcessStartInfo(RendererPath) {UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden}};
             foreach(var arg in new[]{"--render",path,png,json,page.ToString(System.Globalization.CultureInfo.InvariantCulture)})process.StartInfo.ArgumentList.Add(arg);
-            process.Start();
+            process.Start();using var limits=WorkerLimits.Attach(process);
             using var timeout=CancellationTokenSource.CreateLinkedTokenSource(token);timeout.CancelAfter(TimeSpan.FromSeconds(15));
             try {await process.WaitForExitAsync(timeout.Token);} catch(OperationCanceledException) {try{process.Kill(true);await process.WaitForExitAsync();}catch{} if(token.IsCancellationRequested)return;throw new TimeoutException(L.T("preview.timeout"));}
             if(version!=generation||token.IsCancellationRequested||IsDisposed)return;

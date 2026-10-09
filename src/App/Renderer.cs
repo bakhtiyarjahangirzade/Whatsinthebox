@@ -22,12 +22,13 @@ static class Renderer
         RenderInfo info;
         try
         {
-            if(new FileInfo(input).Length>MaxBytes)throw new InvalidDataException(L.T("input.limit"));
+            long length=new FileInfo(input).Length;
             byte[] head=new byte[1024];using(var stream=File.OpenRead(input)){stream.ReadExactly(head.AsSpan(0,(int)Math.Min(head.Length,stream.Length)));}
-            string ext=Path.GetExtension(input).ToLowerInvariant();
+            string ext=Path.GetExtension(input).ToLowerInvariant();bool pdf=ext==".pdf"||Encoding.ASCII.GetString(head).Contains("%PDF-");
+            if(length>(pdf?uint.MaxValue:MaxBytes))throw new InvalidDataException(L.T("input.limit"));
             Environment.SetEnvironmentVariable("MAGICK_CONFIGURE_PATH",AppContext.BaseDirectory);
             if(SupportedFiles.FontExtensions.Contains(ext)){info=FontPreview.Render(input,output);}
-            else if(ext==".pdf"||Encoding.ASCII.GetString(head).Contains("%PDF-")){info=RenderPdf(input,output,page);}
+            else if(pdf){info=RenderPdf(input,output,page);}
             else if(SupportedFiles.TextExtensions.Contains(ext)){info=RenderText(ReadText(input),output,page,L.T("text.mode"),Path.GetFileName(input));}
             else if(head[0]==80&&head[1]==75){info=RenderPackage(input,output,page);}
             else if(ext==".svg"||IsXmlDocument(head)){info=RenderSvg(input,output);}

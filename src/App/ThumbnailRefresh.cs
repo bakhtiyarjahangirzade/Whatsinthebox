@@ -74,7 +74,7 @@ static class ThumbnailRefresh
         while(pending.Count>0&&inspected<512&&folders++<64&&!cancellation.IsCancellationRequested)
         {
             var folder=pending.Dequeue();string[] entries;
-            try{entries=Directory.GetFileSystemEntries(folder.Path).Take(512-inspected).ToArray();}catch{continue;}
+            try{entries=Directory.EnumerateFileSystemEntries(folder.Path).Take(512-inspected).ToArray();}catch{continue;}
             foreach(string path in entries)
             {
                 if(cancellation.IsCancellationRequested)yield break;
