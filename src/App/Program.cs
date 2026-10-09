@@ -28,7 +28,13 @@ static class Program
         if(args.Length>0&&args[0]=="--self-test")
         {
             string report=args.Length>1?args[1]:"test-results.json";
-            try{ApplicationConfiguration.Initialize();return SelfTest.Run(report);}
+            try
+            {
+                ApplicationConfiguration.Initialize();int result=1;
+                using var host=new Form{ShowInTaskbar=false,Opacity=0,Size=new Size(1,1)};
+                host.Shown+=(_,_)=>{host.Hide();try{result=SelfTest.Run(report);}finally{host.Close();}};
+                Application.Run(host);return result;
+            }
             catch(Exception ex){File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{failed=1,results=new[]{new{name="UI verification failure",passed=false,error=ex.ToString()}}}));return 1;}
         }
         ApplicationConfiguration.Initialize();

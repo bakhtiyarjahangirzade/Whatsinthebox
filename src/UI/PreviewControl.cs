@@ -61,7 +61,7 @@ public sealed class PreviewControl : UserControl
         using var dialog=new OpenFileDialog {Title=L.T("file.select"),Filter=SupportedFiles.Filter};
         if(dialog.ShowDialog(FindForm())==DialogResult.OK)_=LoadFileAsync(dialog.FileName);
     }
-    void SetPages(int count){pageCount=Math.Max(1,count);previous.Visible=next.Visible=pages.Visible=pageCount>1;previous.Enabled=currentPage>0;next.Enabled=currentPage<pageCount-1;pages.Text=$"{currentPage+1} / {pageCount}";}
+    void SetPages(int count){toolbar.SuspendLayout();try{pageCount=Math.Max(1,count);pages.Text=$"{currentPage+1} / {pageCount}";previous.Visible=next.Visible=pages.Visible=pageCount>1;previous.Enabled=currentPage>0;next.Enabled=currentPage<pageCount-1;}finally{toolbar.ResumeLayout(true);}}
     void ChangePage(int delta){if(currentPath==null)return;int page=Math.Clamp(currentPage+delta,0,pageCount-1);if(page!=currentPage)_=LoadFileAsync(currentPath,currentName,page);}
     public async Task LoadFileAsync(string path,string? displayName=null,int page=0)
     {
