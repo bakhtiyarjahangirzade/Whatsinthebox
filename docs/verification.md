@@ -11,10 +11,12 @@ The 1.0 release is **not approved yet**. A reported Explorer/Start-menu incident
 | Dependency advisories | NuGet audit with transitive dependencies | No advisories reported at the time of the check |
 | Installer compilation | Five-language maintenance wizard | Passed |
 | Helper shutdown | Missing, responsive and unresponsive helper cases | Passed in isolated process tests |
-| Real Explorer thumbnail and preview integration | Current candidate | Pending |
+| Real Explorer thumbnail and preview integration | Current candidate; VM verification attempt incomplete | Blocked |
 | Clean install, upgrade, repair, downgrade rejection, removal | Current candidate | Pending |
 | Start menu and taskbar stability after install/removal | Current candidate | Pending |
 | Installer signing and download verification | Release candidate | Pending |
+
+The latest isolated Windows attempt returned a successful installer exit code, but did not complete the shared-UI report. A diagnostic retry also stalled while the VM logged repeated timing catch-up failures. These runs do not establish an application root cause or count as passed UI/lifecycle tests. The test machine must provide a reliable result before release approval.
 
 ## Required Windows scenarios
 

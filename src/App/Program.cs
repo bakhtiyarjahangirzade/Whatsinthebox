@@ -24,10 +24,15 @@ static class Program
         if(args.Length>0&&args[0]=="--unregister"){try{Installer.Uninstall();return 0;}catch{return 1;}}
         if(args.Contains("--stop-windows-host")){WindowsHost.Stop();return 0;}
         if(args.Length>0&&args[0]=="--verify-rendering")return SelfTest.Run(args.Length>1?args[1]:"render-tests.json",false);
+        if(args.Length>0&&args[0]=="--self-test")
+        {
+            string report=args.Length>1?args[1]:"test-results.json";
+            try{ApplicationConfiguration.Initialize();return SelfTest.Run(report);}
+            catch(Exception ex){File.WriteAllText(report,System.Text.Json.JsonSerializer.Serialize(new{failed=1,results=new[]{new{name="UI verification failure",passed=false,error=ex.ToString()}}}));return 1;}
+        }
         ApplicationConfiguration.Initialize();
         if(args.Length==2&&args[0]=="--allow-pdf-preview")return PdfPreviewPermission.Prompt(args[1]);
         if(args.Contains("--windows-host")){try{return WindowsHost.Run();}catch(Exception ex){File.WriteAllText(Path.Combine(PreviewStorage.Root,"host-error.txt"),ex.ToString());return 1;}}
-        if(args.Length>0&&args[0]=="--self-test")return SelfTest.Run(args.Length>1?args[1]:"test-results.json");
         if(args.Length==3&&args[0]=="--capture")return SelfTest.Capture(args[1],args[2]);
         if(args.Length>=2&&args[0]=="--capture-settings"){using var form=new SettingsForm();form.Show();Application.DoEvents();using var image=new Bitmap(form.Width,form.Height);form.DrawToBitmap(image,new Rectangle(Point.Empty,form.Size));image.Save(args[1]);form.Close();return 0;}
         Application.Run(new SettingsForm());return 0;
