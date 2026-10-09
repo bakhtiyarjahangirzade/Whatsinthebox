@@ -26,6 +26,11 @@ function RunCheck([string]$name,[string]$file,[string[]]$arguments,[int]$timeout
  if($process.ExitCode -ne 0){throw "Failed: $name ($($process.ExitCode))"}
 }
 try {
+ $savedRoot=$env:DOTNET_ROOT;$savedX64=$env:DOTNET_ROOT_X64;$savedLookup=$env:DOTNET_MULTILEVEL_LOOKUP
+ try{
+  $env:DOTNET_ROOT=Join-Path $root 'artifacts/no-global-runtime';$env:DOTNET_ROOT_X64=$env:DOTNET_ROOT;$env:DOTNET_MULTILEVEL_LOOKUP='0'
+  RunCheck 'self-contained-runtime' $app @('--verify-rendering',('"'+(Join-Path $evidence 'self-contained-runtime.json')+'"'))
+ }finally{$env:DOTNET_ROOT=$savedRoot;$env:DOTNET_ROOT_X64=$savedX64;$env:DOTNET_MULTILEVEL_LOOKUP=$savedLookup}
  try{RunCheck 'shared-ui' $app @('--self-test',('"'+(Join-Path $evidence 'shared-ui.json')+'"'))}catch{Write-Warning $_}
  RunCheck 'fixture' $app @('--write-test-pdf',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
  Copy-Item (Join-Path $root 'artifacts/app/*') (Join-Path $root 'artifacts/windows-tests') -Recurse -Force

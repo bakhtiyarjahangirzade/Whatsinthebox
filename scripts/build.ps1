@@ -1,4 +1,4 @@
-param([switch]$Installer,[string]$RuntimeInstaller)
+param([switch]$Installer)
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 $output=Join-Path $root 'artifacts\app'
