@@ -36,7 +36,9 @@ function Install([string]$name,[string]$installer,[string]$language='en',[bool]$
  Assert ($name+' executable exists') (Test-Path -LiteralPath (InstalledExe))
 }
 function RemoveInstall([string]$name){
- $uninstaller=Join-Path (Get-ItemProperty -LiteralPath $uninstallKey).InstallLocation 'unins000.exe'
+ $uninstallCommand=(Get-ItemProperty -LiteralPath $uninstallKey).UninstallString
+ if($uninstallCommand -notmatch '^"([^"]+)"'){throw 'Unexpected uninstall command'}
+ $uninstaller=$Matches[1]
  Run $name $uninstaller @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/LOG="'+(Join-Path $evidence ($name+'.log'))+'"'))
  Assert ($name+' uninstall entry removed') (!(Test-Path -LiteralPath $uninstallKey))
  Assert ($name+' prior thumbnail restored') ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq $sentinel)

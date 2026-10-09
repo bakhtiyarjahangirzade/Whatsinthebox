@@ -17,7 +17,7 @@ public sealed class PreviewControl : UserControl
     readonly ImageCanvas canvas = new();
     readonly FlowLayoutPanel toolbar = new();
     CancellationTokenSource? cancellation;
-    int generation;
+    int generation;bool loading;
     string? currentPath,currentName;int currentPage,pageCount=1;
     Button previous=null!,next=null!;Label pages=new();
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
@@ -66,7 +66,7 @@ public sealed class PreviewControl : UserControl
     public async Task LoadFileAsync(string path,string? displayName=null,int page=0)
     {
         currentPath=path;currentName=displayName;currentPage=page;if(page==0)SetPages(1);previous.Enabled=next.Enabled=false;
-        cancellation?.Cancel();cancellation?.Dispose();cancellation=new();var token=cancellation.Token;var version=++generation;
+        cancellation?.Cancel();cancellation?.Dispose();cancellation=new();var token=cancellation.Token;var version=++generation;loading=true;
         title.Text=displayName??Path.GetFileName(path);canvas.SetImage(null);canvas.Caption=L.T("preview.loading");status.Text=L.T("preview.readonly");
         var dir=Path.Combine(PreviewStorage.Root,Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
         try
@@ -88,10 +88,10 @@ public sealed class PreviewControl : UserControl
         }
         catch(OperationCanceledException){}
         catch(Exception ex) {if(version==generation&&!IsDisposed){canvas.Caption=L.T("preview.failed");canvas.Invalidate();status.Text=ex is PreviewFailure or TimeoutException?ex.Message:L.T("preview.generic");SetPages(pageCount);if(CaptureEnabled(path))File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=false,error=status.Text}));}}
-        finally {try{Directory.Delete(dir,true);}catch{}}
+        finally {if(version==generation)loading=false;try{Directory.Delete(dir,true);}catch{}}
     }
     protected override void Dispose(bool disposing){if(disposing){generation++;cancellation?.Cancel();cancellation?.Dispose();}base.Dispose(disposing);}
-    public bool HasPreview=>canvas.HasImage;
+    public bool HasPreview=>canvas.HasImage&&!loading;
     bool CaptureEnabled(string input){string marker=Path.Combine(Path.GetDirectoryName(RendererPath)!,"test-capture.flag");return File.Exists(marker)&&File.ReadAllText(marker).Trim().Equals(Path.GetFullPath(input),StringComparison.OrdinalIgnoreCase);}
 }
 
