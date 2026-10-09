@@ -44,3 +44,8 @@ jobs:
         with:
           name: windows-lifecycle-evidence
           path: artifacts/windows-checks
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: verified-installer
+          path: artifacts/installer/*-Setup.exe

@@ -25,6 +25,9 @@ static class SystemHostTests
   try
   {
    Marshal.ThrowExceptionForHR(CoInitializeEx(IntPtr.Zero,2));
+   Guid cacheClass=new("50ef4544-ac9f-4a8e-b21b-8a26180db13f"),cacheIid=new("f676c15d-596a-4ce2-8234-33996f445db1");
+   int cacheHr=CoCreateInstance(in cacheClass,IntPtr.Zero,1,in cacheIid,out var cache);if(cache!=IntPtr.Zero)Marshal.Release(cache);
+   results.Add(new{name="Windows thumbnail cache available",passed=cacheHr==0,hresult=$"0x{cacheHr:X8}"});if(cacheHr!=0)failed++;
    string embedded=Path.Combine(PreviewStorage.Root,"embedded-test.json");if(File.Exists(embedded))File.Delete(embedded);
    Guid thumbClass=new(IntegrationIds.Thumbnail),thumbIid=typeof(IThumbnailProvider).GUID,fileIid=typeof(IInitializeWithFile).GUID;
    Stage("thumbnail activation");Marshal.ThrowExceptionForHR(CoCreateInstance(in thumbClass,IntPtr.Zero,4,in thumbIid,out var thumbnail));Stage("thumbnail initialization");Marshal.ThrowExceptionForHR(Marshal.QueryInterface(thumbnail,in fileIid,out var input));Marshal.ThrowExceptionForHR(Method<InitFile>(input,3)(input,pdf,0));

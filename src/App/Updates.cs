@@ -7,7 +7,7 @@ internal static class Updates
 {
  internal const string Repository="https://github.com/bakhtiyarjahangirzade/Whatsinthebox";
  static string Cache=>Path.Combine(Installer.Root,"updates.json");
- internal static readonly Version Current=new(0,6,3);
+ internal static readonly Version Current=new(typeof(Updates).Assembly.GetName().Version!.ToString(3));
  static readonly SemaphoreSlim Gate=new(1,1);
  internal static Version? Parse(string? tag)=>Version.TryParse(tag?.TrimStart('v'),out var version)?version:null;
  internal static UpdateResult Select(JsonElement releases)
@@ -29,7 +29,7 @@ internal static class Updates
   {
    if(!force&&File.Exists(Cache)&&DateTime.UtcNow-File.GetLastWriteTimeUtc(Cache)<TimeSpan.FromHours(24))try{var entry=JsonSerializer.Deserialize<UpdateCache>(await File.ReadAllTextAsync(Cache));var cached=entry?.Schema==1?entry.Result:null;if(cached?.State=="current")return cached;if(cached?.State=="available"&&Parse(cached.Version)>Current&&Uri.TryCreate(cached.Url,UriKind.Absolute,out var link)&&link.Scheme=="https"&&link.Host=="github.com"&&link.AbsolutePath.StartsWith("/bakhtiyarjahangirzade/Whatsinthebox/releases/download/",StringComparison.Ordinal))return cached;}catch{}
    if(!NetworkInterface.GetIsNetworkAvailable())return new("offline");
-   using var client=new HttpClient{Timeout=TimeSpan.FromSeconds(6)};client.DefaultRequestHeaders.UserAgent.ParseAdd("Whatsinthebox/0.6.3");client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+   using var client=new HttpClient{Timeout=TimeSpan.FromSeconds(6)};client.DefaultRequestHeaders.UserAgent.ParseAdd($"Whatsinthebox/{Current}");client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    using var response=await client.GetAsync("https://api.github.com/repos/bakhtiyarjahangirzade/Whatsinthebox/releases?per_page=20",HttpCompletionOption.ResponseHeadersRead);
    response.EnsureSuccessStatusCode();if(response.Content.Headers.ContentLength>1048576)return new("error");
    using var stream=await response.Content.ReadAsStreamAsync();using var memory=new MemoryStream();var buffer=new byte[8192];int n;using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(6));while((n=await stream.ReadAsync(buffer,timeout.Token))>0){if(memory.Length+n>1048576)return new("error");memory.Write(buffer,0,n);}
