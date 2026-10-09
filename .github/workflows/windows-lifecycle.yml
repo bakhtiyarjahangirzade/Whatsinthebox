@@ -18,9 +18,20 @@ jobs:
           ./scripts/build.ps1
           dotnet publish tests/Tests.csproj -c Release --self-contained false -o artifacts/windows-tests -m:1
           if ($LASTEXITCODE -ne 0) { throw 'Integration test build failed' }
+      - name: Prepare isolated installer environment
+        shell: pwsh
+        run: ./scripts/prepare-windows.ps1
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          ISCC installer/Setup.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
       - name: Isolated Windows lifecycle and shell checks
         shell: pwsh
         run: ./scripts/check-windows.ps1
+      - name: Installer user journeys
+        shell: pwsh
+        run: ./scripts/check-installer.ps1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
