@@ -99,6 +99,7 @@ try {
   Assert 'previous preview class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{8A04DBB7-7A32-4922-A95A-C33FAC9E733B}'))
   Assert 'previous thumbnail class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
   Assert 'new thumbnail class active' ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq '{916D5157-F38C-4068-A7E9-613E8E6DFD64}')
+  Assert 'native factory avoids inaccessible surrogate' ((Get-Item 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}').GetValue('DisableProcessIsolation') -eq 1)
   $newBridge=(Get-Item 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}\InprocServer32').GetValue('')
   Assert 'new bridge path selected' ($newBridge -ne $heldPath -and (Test-Path -LiteralPath $newBridge))
   $fixture=Join-Path $evidence 'migration.pdf'
