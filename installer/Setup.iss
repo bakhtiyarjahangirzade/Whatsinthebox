@@ -44,7 +44,7 @@ Name: "tr"; MessagesFile: "compiler:Languages\Turkish.isl"; LicenseFile: "..\LIC
 
 [CustomMessages]
 en.uninstall=Uninstall
-en.setup_task=Add Windows previews and thumbnails (requires .NET 10)
+en.setup_task=Add Windows previews and thumbnails
 en.setup_settings=Open preview settings
 en.setup_github=Visit the Whatsinthebox GitHub repository
 en.setup_author=Created by Bakhtiyar Jahangirzade
@@ -53,7 +53,7 @@ en.setup_registration_failed=The feature was installed, but Windows integration 
 en.setup_uninstall_failed=Previous preview handlers could not be restored. Uninstall stopped before deleting files.
 en.setup_license=Whatsinthebox is free and open source under the MIT License. The original license and dependency notices are included with the installation. Files stay on your computer. No account, payment or subscription is required.
 ru.uninstall=Удалить
-ru.setup_task=Добавить предпросмотр и миниатюры Windows (нужен .NET 10)
+ru.setup_task=Добавить предпросмотр и миниатюры Windows
 ru.setup_settings=Открыть настройки просмотра
 ru.setup_github=Открыть репозиторий Whatsinthebox на GitHub
 ru.setup_author=Автор: Bakhtiyar Jahangirzade
@@ -62,7 +62,7 @@ ru.setup_registration_failed=Компонент установлен, но ин�
 ru.setup_uninstall_failed=Прежние обработчики не восстановлены. Удаление остановлено до удаления файлов.
 ru.setup_license=Whatsinthebox бесплатен и имеет открытый код по лицензии MIT. Оригинал лицензии и уведомления зависимостей входят в установку. Файлы остаются на компьютере. Учётная запись, оплата и подписка не нужны.
 de.uninstall=Deinstallieren
-de.setup_task=Windows-Vorschau und Miniaturansichten hinzufügen (.NET 10 erforderlich)
+de.setup_task=Windows-Vorschau und Miniaturansichten hinzufügen
 de.setup_settings=Vorschaueinstellungen öffnen
 de.setup_github=Whatsinthebox-Repository auf GitHub öffnen
 de.setup_author=Entwickelt von Bakhtiyar Jahangirzade
@@ -71,7 +71,7 @@ de.setup_registration_failed=Funktion installiert, Windows-Integration muss jedo
 de.setup_uninstall_failed=Bisherige Vorschau-Handler konnten nicht wiederhergestellt werden. Deinstallation vor dem Löschen gestoppt.
 de.setup_license=Whatsinthebox ist kostenlos und quelloffen unter der MIT-Lizenz. Originallizenz und Hinweise zu Abhängigkeiten sind enthalten. Dateien bleiben auf Ihrem Computer. Kein Konto, keine Zahlung und kein Abonnement erforderlich.
 zh.uninstall=卸载
-zh.setup_task=添加 Windows 预览及缩略图（需要 .NET 10）
+zh.setup_task=添加 Windows 预览及缩略图
 zh.setup_settings=打开预览设置
 zh.setup_github=访问 Whatsinthebox 的 GitHub 仓库
 zh.setup_author=作者：Bakhtiyar Jahangirzade
@@ -80,7 +80,7 @@ zh.setup_registration_failed=功能已安装，但 Windows 集成需要修复，
 zh.setup_uninstall_failed=无法恢复原有预览处理程序，卸载已在删除文件前停止。
 zh.setup_license=Whatsinthebox 免费开源，采用 MIT 许可证。安装包包含原始许可证及依赖项声明。文件保留在本机，无需账户、付款或订阅。
 tr.uninstall=Kaldır
-tr.setup_task=Windows önizlemelerini ve küçük resimleri ekle (.NET 10 gerekir)
+tr.setup_task=Windows önizlemelerini ve küçük resimleri ekle
 tr.setup_settings=Önizleme ayarlarını aç
 tr.setup_github=Whatsinthebox GitHub reposunu ziyaret et
 tr.setup_author=Geliştiren: Bakhtiyar Jahangirzade
@@ -135,7 +135,6 @@ Name: "explorer"; Description: "{cm:setup_task}"; Flags: checkedonce
 
 [Files]
 Source: "..\artifacts\app\*"; DestDir: "{app}\{code:InstallBin}"; Excludes: "*.pdb"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\artifacts\vendor\windowsdesktop-runtime-x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "StopHelper.ps1"; DestDir: "{tmp}"; Flags: dontcopy
 
 
@@ -271,13 +270,6 @@ begin
 #endif
 end;
 
-function DesktopRuntimeInstalled: Boolean;
-var Found: TFindRec;
-begin
-  Result := FindFirst(ExpandConstant('{pf64}\dotnet\shared\Microsoft.WindowsDesktop.App\10.*'), Found);
-  if Result then FindClose(Found);
-end;
-
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var Code, FolderIndex: Integer; RepairRequested: Boolean;
 begin
@@ -310,16 +302,6 @@ begin
   while DirExists(AddBackslash(WizardDirValue) + BinaryFolder) do begin
     FolderIndex := FolderIndex + 1;
     BinaryFolder := '{#AppVersion}-' + IntToStr(FolderIndex);
-  end;
-  if WizardIsTaskSelected('explorer') and not DesktopRuntimeInstalled then begin
-    ExtractTemporaryFile('windowsdesktop-runtime-x64.exe');
-    if not ShellExec('runas', ExpandConstant('{tmp}\windowsdesktop-runtime-x64.exe'), '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, Code) then
-      Result := ExpandConstant('{cm:setup_runtime_failed}')
-    else if (Code <> 0) and (Code <> 3010) then
-      Result := ExpandConstant('{cm:setup_runtime_failed}') + ' (' + IntToStr(Code) + ')'
-    else if not DesktopRuntimeInstalled then
-      Result := ExpandConstant('{cm:setup_runtime_failed}');
-    NeedsRestart := Code = 3010;
   end;
 end;
 

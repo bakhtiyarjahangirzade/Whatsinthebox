@@ -29,6 +29,7 @@ try {
  try{RunCheck 'shared-ui' $app @('--self-test',('"'+(Join-Path $evidence 'shared-ui.json')+'"'))}catch{Write-Warning $_}
  RunCheck 'fixture' $app @('--write-test-pdf',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
  Copy-Item (Join-Path $root 'artifacts/app/*') (Join-Path $root 'artifacts/windows-tests') -Recurse -Force
+ Copy-Item (Join-Path $root 'artifacts/developer-shell/*') (Join-Path $root 'artifacts/windows-tests/shell') -Recurse -Force
  RunCheck 'direct-com' $tests @(('"'+(Join-Path $evidence 'direct-com.json')+'"'))
  RunCheck 'register' $app @('--register')
  [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'test-capture.flag'),(Join-Path $evidence 'fixture.pdf'))

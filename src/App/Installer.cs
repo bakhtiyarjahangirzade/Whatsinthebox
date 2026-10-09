@@ -15,8 +15,6 @@ static class Installer
     }
     public static void Install(bool inPlace=false)
     {
-        var runtime=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"dotnet","shared","Microsoft.WindowsDesktop.App");
-        if(!Directory.Exists(runtime)||!Directory.EnumerateDirectories(runtime).Any(p=>Path.GetFileName(p).StartsWith("10.")))throw new IOException(L.T("runtime.required"));
         var source=AppContext.BaseDirectory;
         if(!File.Exists(Path.Combine(source,"shell","Whatsinthebox.Bridge.dll")))throw new IOException(L.T("extension.missing"));
         Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app",Updates.Current.ToString());Directory.CreateDirectory(bin);
