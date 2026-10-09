@@ -25,6 +25,13 @@ if(!$Context){
 $authorized=Get-Content -LiteralPath $Context -Raw | ConvertFrom-Json
 if(!$authorized.authorized -or $authorized.sid -ne [Security.Principal.WindowsIdentity]::GetCurrent().User.Value){throw 'Invalid isolated desktop context'}
 $env:GITHUB_ACTIONS='true';$env:RUNNER_OS='Windows'
+$currentPrincipal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
+ Add-Type -Path (Join-Path $PSScriptRoot 'DesktopToken.cs')
+ $exit=[DesktopToken]::Run((Join-Path $PSHOME 'pwsh.exe'),('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$Context+'"'),$root)
+ if($exit -ne 0){throw 'Restricted desktop worker failed'}
+ exit
+}
 $app=Join-Path $root 'artifacts/app/Whatsinthebox.exe';$tests=Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe';$fixtures=Join-Path $evidence 'desktop-fixtures'
 function Run([string]$file,[string[]]$arguments){$p=Start-Process -FilePath $file -ArgumentList $arguments -PassThru;$handle=$p.Handle;if(!$p.WaitForExit(150000)){Stop-Process -Id $p.Id -Force;throw 'Desktop command timed out'};if($p.ExitCode -ne 0){throw ('Desktop command failed '+$p.ExitCode)}}
 $success=$false;$errorText=$null

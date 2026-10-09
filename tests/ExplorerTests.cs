@@ -10,7 +10,7 @@ static class ExplorerTests
     {
         if(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")!="true")throw new InvalidOperationException("Real Explorer checks require an isolated runner.");
         var results=new List<object>();dynamic? shell=null,window=null;int failed=0;
-        void Stage(string value)=>File.WriteAllText(report+".stage",value);
+        void Stage(string value)=>File.AppendAllText(report+".stage",DateTime.UtcNow.ToString("O")+" "+value+Environment.NewLine);
         try
         {
             using(var preferences=Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\DetailsContainer"))preferences.SetValue("DetailsContainer",new byte[]{1,0,0,0,1,0,0,0},Microsoft.Win32.RegistryValueKind.Binary);
