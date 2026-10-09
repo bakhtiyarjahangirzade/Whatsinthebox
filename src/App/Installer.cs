@@ -8,6 +8,7 @@ static class Installer
     public static string Root=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Whatsinthebox");
     static string BackupFile=>Path.Combine(Root,"registration-backup.json");
     sealed record Snapshot(string Path,string? Original,RegistryValueKind Kind,string Installed,bool Existed);
+    sealed record PreviewOptions(int? ShowPreviewHandlers,int? IconsOnly);
     public static void PromptInstall(IWin32Window owner)
     {
         if(AppDialog.Show(owner,L.T("repair.confirm"),true)!=DialogResult.Yes)return;
@@ -100,13 +101,19 @@ static class Installer
             Notify();
             if(!EffectiveHandler(".pdf",IntegrationIds.PreviewInterface).Equals(IntegrationIds.Preview,StringComparison.OrdinalIgnoreCase))throw new IOException(L.T("registration.failed"));
             if(!EffectiveHandler(".pdf",IntegrationIds.ThumbnailInterface).Equals(IntegrationIds.Thumbnail,StringComparison.OrdinalIgnoreCase))throw new IOException(L.T("registration.failed"));
+            using(var options=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"))
+            {
+                string backup=Path.Combine(Root,"preview-options-backup.json");
+                if(!File.Exists(backup))File.WriteAllText(backup,JsonSerializer.Serialize(new PreviewOptions(options.GetValue("ShowPreviewHandlers") as int?,options.GetValue("IconsOnly") as int?)));
+                options.SetValue("ShowPreviewHandlers",1,RegistryValueKind.DWord);options.SetValue("IconsOnly",0,RegistryValueKind.DWord);
+            }
             using(var startup=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run"))
             {
                 string backup=Path.Combine(Root,"startup-backup.json");
                 if(!File.Exists(backup)){string? original=startup.GetValue("Whatsinthebox") as string;if(original?.Contains("Whatsinthebox.exe",StringComparison.OrdinalIgnoreCase)==true&&original.Contains("--windows-host"))original=null;File.WriteAllText(backup,JsonSerializer.Serialize(original));}
                 startup.SetValue("Whatsinthebox",$"\"{Path.Combine(bin,"Whatsinthebox.exe")}\" --windows-host");
             }
-            WindowsHost.Stop();Thread.Sleep(600);
+            Notify();WindowsHost.Stop();Thread.Sleep(600);
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Path.Combine(bin,"Whatsinthebox.exe"),"--windows-host --refresh-existing"){UseShellExecute=false,CreateNoWindow=true,WindowStyle=System.Diagnostics.ProcessWindowStyle.Hidden});
         }
         catch{Uninstall();throw;}
@@ -114,6 +121,18 @@ static class Installer
     public static void Uninstall()
     {
         WindowsHost.Stop();
+        string optionsBackup=Path.Combine(Root,"preview-options-backup.json");
+        if(File.Exists(optionsBackup))
+        {
+            var original=JsonSerializer.Deserialize<PreviewOptions>(File.ReadAllText(optionsBackup))!;
+            using var options=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced",true);
+            foreach(var value in new[]{("ShowPreviewHandlers",original.ShowPreviewHandlers,1),("IconsOnly",original.IconsOnly,0)})
+            {
+                if(options?.GetValue(value.Item1) is not int current||current!=value.Item3)continue;
+                if(value.Item2.HasValue)options.SetValue(value.Item1,value.Item2.Value,RegistryValueKind.DWord);else options.DeleteValue(value.Item1,false);
+            }
+            File.Delete(optionsBackup);
+        }
         using(var startup=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run",true))
         {
             string backup=Path.Combine(Root,"startup-backup.json");string? current=startup?.GetValue("Whatsinthebox") as string;

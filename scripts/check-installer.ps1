@@ -17,6 +17,11 @@ $thumbnailKey='HKCU:\Software\Classes\.pdf\shellex\{e357fccd-a995-4576-b01f-2346
 $sentinel='{EDCC8F6F-6881-4D14-B93D-7F50DB3AD59D}'
 $results=[Collections.Generic.List[object]]::new()
 $started=Get-Date
+$optionsKey='HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+$originalOptions=Get-ItemProperty -LiteralPath $optionsKey -ErrorAction SilentlyContinue
+New-Item -Path $optionsKey -Force | Out-Null
+Set-ItemProperty -LiteralPath $optionsKey -Name ShowPreviewHandlers -Type DWord -Value 0
+Set-ItemProperty -LiteralPath $optionsKey -Name IconsOnly -Type DWord -Value 1
 function Assert([string]$name,[bool]$passed){
  $results.Add(@{name=$name;passed=$passed})
  if(!$passed){throw "Failed: $name"}
@@ -45,6 +50,9 @@ function RemoveInstall([string]$name){
  Assert ($name+' class removed') (!(Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'))
  $startup=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  Assert ($name+' startup removed') (!$startup)
+ $options=Get-ItemProperty -LiteralPath $optionsKey
+ Assert ($name+' preview preference restored') ($options.ShowPreviewHandlers -eq 0)
+ Assert ($name+' thumbnail preference restored') ($options.IconsOnly -eq 1)
 }
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
 New-Item -Path $thumbnailKey -Force | Out-Null
@@ -58,6 +66,9 @@ try {
   Run ('settings-'+$language) $exe @('--capture-settings',('"'+(Join-Path $evidence ('settings-'+$language+'.png'))+'"'),'--locale',$language)
   Assert ($language+' settings screenshot') ((Get-Item (Join-Path $evidence ('settings-'+$language+'.png'))).Length -gt 1000)
   if($language -eq 'en'){
+   $options=Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+   Assert 'Windows preview option enabled automatically' ($options.ShowPreviewHandlers -eq 1)
+   Assert 'Windows thumbnails enabled automatically' ($options.IconsOnly -eq 0)
    foreach($imageExtension in '.png','.jpg','.jpeg'){
     $imagePreview='HKCU:\Software\Classes\'+$imageExtension+'\shellex\{8895b1c6-b41f-4c1c-a562-0d564250836f}'
     $imageHandler=if(Test-Path -LiteralPath $imagePreview){(Get-Item -LiteralPath $imagePreview).GetValue('')}else{$null}
@@ -121,5 +132,9 @@ try {
  $results | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $evidence 'installer-summary.json')
  if(Test-Path $uninstallKey){
   try{Run 'emergency-unregister' (InstalledExe) @('--unregister')}catch{Write-Warning $_}
+ }
+ foreach($option in 'ShowPreviewHandlers','IconsOnly'){
+  if($null -eq $originalOptions.$option){Remove-ItemProperty -LiteralPath $optionsKey -Name $option -ErrorAction SilentlyContinue}
+  else{Set-ItemProperty -LiteralPath $optionsKey -Name $option -Value $originalOptions.$option}
  }
 }
