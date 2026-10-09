@@ -30,7 +30,7 @@ static class Renderer
             else if(ext==".pdf"||Encoding.ASCII.GetString(head).Contains("%PDF-")){info=RenderPdf(input,output,page);}
             else if(SupportedFiles.TextExtensions.Contains(ext)){info=RenderText(ReadText(input),output,page,L.T("text.mode"),Path.GetFileName(input));}
             else if(head[0]==80&&head[1]==75){info=RenderPackage(input,output,page);}
-            else if(ext==".svg"||Encoding.UTF8.GetString(head).Contains("<svg",StringComparison.OrdinalIgnoreCase)||Encoding.UTF8.GetString(head).Contains("<?xml")||Encoding.UTF8.GetString(head).TrimStart('\uFEFF',' ','\n','\r','\t').StartsWith("<!--")){info=RenderSvg(input,output);}
+            else if(ext==".svg"||IsXmlDocument(head)){info=RenderSvg(input,output);}
             else
             {
                 bool psd=Encoding.ASCII.GetString(head,0,4)=="8BPS";
@@ -48,7 +48,7 @@ static class Renderer
                 info=new(true,psd?L.T("psd.note"):L.T("source.unchanged"),width,height,psd?L.T("mode.psd"):L.T("mode.image"));
             }
         }
-        catch(Exception ex){info=new(false,ex is InvalidDataException?ex.Message:L.T("preview.generic"));}
+        catch(Exception ex){info=new(false,ex is InvalidDataException?ex.Message:L.T("preview.generic"));if(Environment.GetEnvironmentVariable("WHATSINTHEBOX_RENDER_DIAGNOSTICS")=="1")File.WriteAllText(result+".diagnostics",ex.ToString());}
         File.WriteAllText(result,JsonSerializer.Serialize(info));return info.Success?0:1;
     }
     static RenderInfo RenderPdf(string input,string output,int page)
@@ -108,7 +108,8 @@ static class Renderer
     static RenderInfo RenderSvg(string input,string output)
     {
         if(new FileInfo(input).Length>8L*1024*1024)throw new InvalidDataException(L.T("svg.limit"));
-        using var reader=XmlReader.Create(input,new XmlReaderSettings {DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=8L*1024*1024});var document=XDocument.Load(reader);
+        // Ignore legacy SVG DOCTYPE declarations without fetching or expanding DTDs.
+        using var reader=XmlReader.Create(input,new XmlReaderSettings {DtdProcessing=DtdProcessing.Ignore,XmlResolver=null,MaxCharactersInDocument=8L*1024*1024});var document=XDocument.Load(reader);
         if(document.Root?.Name.LocalName!="svg")throw new InvalidDataException(L.T("svg.invalid"));
         foreach(var node in document.Descendants())
         {
@@ -125,6 +126,11 @@ static class Renderer
         float scale=Math.Min(2f,2400f/Math.Max(bounds.Width,bounds.Height));int w=Math.Max(1,(int)Math.Ceiling(bounds.Width*scale)),h=Math.Max(1,(int)Math.Ceiling(bounds.Height*scale));
         using var surface=SKSurface.Create(new SKImageInfo(w,h));surface.Canvas.Clear(SKColors.Transparent);surface.Canvas.Scale(scale);surface.Canvas.Translate(-bounds.Left,-bounds.Top);surface.Canvas.DrawPicture(picture);using var image=surface.Snapshot();using var data=image.Encode(SKEncodedImageFormat.Png,100);using var file=File.Create(output);data.SaveTo(file);
         return new(true,L.T("svg.note"),(int)Math.Ceiling(bounds.Width),(int)Math.Ceiling(bounds.Height),"SVG • "+L.T("svg.mode"));
+    }
+    static bool IsXmlDocument(byte[] head)
+    {
+        string prefix=Encoding.UTF8.GetString(head).TrimStart('\uFEFF',' ','\n','\r','\t');
+        return prefix.StartsWith("<svg",StringComparison.OrdinalIgnoreCase)||prefix.StartsWith("<?xml",StringComparison.OrdinalIgnoreCase)||prefix.StartsWith("<!--",StringComparison.Ordinal);
     }
     static bool SafeCss(string value)
     {
