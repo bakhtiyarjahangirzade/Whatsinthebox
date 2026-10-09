@@ -18,7 +18,7 @@ static class Installer
         var runtime=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"dotnet","shared","Microsoft.WindowsDesktop.App");
         if(!Directory.Exists(runtime)||!Directory.EnumerateDirectories(runtime).Any(p=>Path.GetFileName(p).StartsWith("10.")))throw new IOException(L.T("runtime.required"));
         var source=AppContext.BaseDirectory;
-        if(!File.Exists(Path.Combine(source,"shell","Whatsinthebox.Shell.comhost.dll")))throw new IOException(L.T("extension.missing"));
+        if(!File.Exists(Path.Combine(source,"shell","Whatsinthebox.Bridge.dll")))throw new IOException(L.T("extension.missing"));
         Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app",Updates.Current.ToString());Directory.CreateDirectory(bin);
         if(!Path.GetFullPath(source).TrimEnd('\\').Equals(Path.GetFullPath(bin).TrimEnd('\\'),StringComparison.OrdinalIgnoreCase))foreach(var file in Directory.EnumerateFiles(source,"*",SearchOption.AllDirectories)){var target=Path.Combine(bin,Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
         var targets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
@@ -66,7 +66,7 @@ static class Installer
                 using var local=cls.CreateSubKey("LocalServer32");local.SetValue("",$"\"{Path.Combine(bin,"Whatsinthebox.exe")}\" --windows-host");local.SetValue("ServerExecutable",Path.Combine(bin,"Whatsinthebox.exe"));
                 // Both file and stream initialization are supported; retain Windows' default thumbnail isolation.
                 cls.DeleteValue("DisableProcessIsolation",false);
-                using var server=cls.CreateSubKey("InprocServer32");server.SetValue("",Path.Combine(bin,"shell","Whatsinthebox.Shell.comhost.dll"));server.SetValue("ThreadingModel","Apartment");
+                using var server=cls.CreateSubKey("InprocServer32");server.SetValue("",Path.Combine(bin,"shell","Whatsinthebox.Bridge.dll"));server.SetValue("ThreadingModel","Apartment");
             }
             using(var list=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\PreviewHandlers"))list.SetValue(IntegrationIds.Preview,"Whatsinthebox");
             foreach(var pair in targets){using var key=Registry.CurrentUser.CreateSubKey(pair.Key);key.SetValue("",pair.Value);}
