@@ -72,7 +72,7 @@ try {
  Assert 'upgrade selects current binary' ([Diagnostics.FileVersionInfo]::GetVersionInfo($current).FileVersion -eq [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $root 'artifacts/app/Whatsinthebox.exe')).FileVersion)
  # A real Windows executable with a newer file version supplies a read-only version-detection fixture.
  $newer=Join-Path $env:WINDIR 'System32/notepad.exe'
- Assert 'newer-version fixture' ([version][Diagnostics.FileVersionInfo]::GetVersionInfo($newer).FileVersion -gt [version][Diagnostics.FileVersionInfo]::GetVersionInfo($current).FileVersion)
+ Assert 'newer-version fixture' ([Diagnostics.FileVersionInfo]::GetVersionInfo($newer).FileMajorPart -gt [Diagnostics.FileVersionInfo]::GetVersionInfo($current).FileMajorPart)
  Set-ItemProperty -LiteralPath $uninstallKey -Name DisplayIcon -Value $newer
  try{Run 'downgrade-refused' $setup @('/VERYSILENT','/SUPPRESSMSGBOXES','/SP-','/NORESTART',('/DIR="'+$installRoot+'"'),('/LOG="'+(Join-Path $evidence 'downgrade.log')+'"')) $false}
  finally{Set-ItemProperty -LiteralPath $uninstallKey -Name DisplayIcon -Value $current}

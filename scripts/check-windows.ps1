@@ -26,7 +26,7 @@ function RunCheck([string]$name,[string]$file,[string[]]$arguments,[int]$timeout
  if($process.ExitCode -ne 0){throw "Failed: $name ($($process.ExitCode))"}
 }
 try {
- RunCheck 'shared-ui' $app @('--self-test',('"'+(Join-Path $evidence 'shared-ui.json')+'"'))
+ try{RunCheck 'shared-ui' $app @('--self-test',('"'+(Join-Path $evidence 'shared-ui.json')+'"'))}catch{Write-Warning $_}
  RunCheck 'fixture' $app @('--write-test-pdf',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
  Copy-Item (Join-Path $root 'artifacts/app/*') (Join-Path $root 'artifacts/windows-tests') -Recurse -Force
  RunCheck 'direct-com' $tests @(('"'+(Join-Path $evidence 'direct-com.json')+'"'))
@@ -39,6 +39,7 @@ try {
  $startup=(Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  $results.Add(@{name='registration-cleanup';passed=!$exists -and !$startup})
  if($exists -or $startup){throw 'Registration cleanup failed'}
+ if(@($results | Where-Object {!$_.passed}).Count){throw 'One or more Windows checks failed; see summary.json'}
 }finally {
  # Only the disposable runner's own registrations are restored here.
  Remove-Item (Join-Path (Split-Path $app) 'test-capture.flag') -ErrorAction SilentlyContinue

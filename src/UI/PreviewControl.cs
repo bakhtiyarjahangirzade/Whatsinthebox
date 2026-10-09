@@ -119,7 +119,7 @@ public sealed class ImageCanvas : Control
         var region=g.Save();g.SetClip(r);
         if(BackgroundMode==0){using var a=new SolidBrush(Color.FromArgb(221,227,234));using var b=new SolidBrush(Color.FromArgb(187,198,210));g.FillRectangle(a,r);for(int y=Math.Max(0,r.Top);y<Math.Min(Height,r.Bottom);y+=16)for(int x=Math.Max(0,r.Left);x<Math.Min(Width,r.Right);x+=16)if(((x-Math.Max(0,r.Left))/16+(y-Math.Max(0,r.Top))/16)%2==0)g.FillRectangle(b,x,y,16,16);}
         else g.Clear(BackgroundMode==1?Color.White:Color.FromArgb(29,29,31));
-        g.InterpolationMode=InterpolationMode.HighQualityBicubic;g.DrawImage(image,r);g.Restore(region);
+        g.InterpolationMode=InterpolationMode.HighQualityBicubic;using var attributes=new System.Drawing.Imaging.ImageAttributes();attributes.SetWrapMode(WrapMode.TileFlipXY);g.DrawImage(image,r,0,0,image.Width,image.Height,GraphicsUnit.Pixel,attributes);g.Restore(region);
         using var pen=new Pen(Theme.Muted);g.DrawRectangle(pen,r);
     }
     protected override void Dispose(bool disposing){if(disposing)image?.Dispose();base.Dispose(disposing);}

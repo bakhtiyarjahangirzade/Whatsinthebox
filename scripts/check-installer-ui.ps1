@@ -24,7 +24,7 @@ $results=[Collections.Generic.List[object]]::new()
 try {
  foreach($language in 'en','ru','de','zh','tr'){
   $state=Join-Path $evidence ('wizard-'+$language+'.txt')
-  $process=Start-Process $setup -WindowStyle Hidden -PassThru -ArgumentList '/SP-','/NORESTART',('/LANG='+$language),('/DIR="'+(Join-Path $root ('artifacts/qa-'+$language))+'"'),('/QALAYOUT="'+$state+'"')
+  $process=Start-Process $setup -WindowStyle Hidden -PassThru -ArgumentList '/SP-','/NORESTART',('/LANG='+$language),('/DIR="'+(Join-Path $root ('artifacts/qa-'+$language))+'"'),('/QALAYOUT="'+$state+'"'),('/LOG="'+(Join-Path $evidence ('wizard-'+$language+'.log'))+'"')
   $until=(Get-Date).AddSeconds(90)
   while(!(Test-Path $state) -and !$process.HasExited -and (Get-Date) -lt $until){Start-Sleep -Milliseconds 250}
   if(!(Test-Path $state)){throw "Wizard failed to reach finish: $language"}

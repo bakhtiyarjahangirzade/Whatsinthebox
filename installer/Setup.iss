@@ -176,6 +176,9 @@ procedure DetectInstalled;
 var Found: TFindRec; VersionMS, VersionLS: Cardinal; Packed, Best: Int64; RegisteredRoot, RegisteredIcon: String;
 begin
   InstalledExe := ''; InstalledVersion := ''; Best := -1;
+#ifdef QA_LAYOUT
+  Exit;
+#endif
   InstalledRoot := ExpandConstant('{localappdata}\Whatsinthebox\app');
   if RegQueryStringValue(HKCU64, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{1B978517-80B7-49E9-AE4F-F83A9844F190}_is1', 'InstallLocation', RegisteredRoot) and (RegisteredRoot <> '') then InstalledRoot := RegisteredRoot;
   if RegQueryStringValue(HKCU64, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{1B978517-80B7-49E9-AE4F-F83A9844F190}_is1', 'DisplayIcon', RegisteredIcon) then begin
@@ -203,6 +206,7 @@ begin
   if InstalledExe <> '' then begin
     GetVersionNumbersString(InstalledExe, InstalledVersion);
     InstalledComparison := ComparePackedVersion(Best, {#StrToVersion(AppVersion)});
+    Log('Detected installation: ' + InstalledVersion + '; setup: {#AppVersion}; comparison: ' + IntToStr(InstalledComparison));
   end;
 end;
 
