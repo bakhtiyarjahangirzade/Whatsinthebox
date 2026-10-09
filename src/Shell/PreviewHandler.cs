@@ -14,7 +14,7 @@ namespace Whatsinthebox.Shell;
 [ComVisible(true),Guid("FC4801A3-2BA9-11CF-A229-00AA003D7352"),InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]public interface IObjectWithSite {void SetSite([MarshalAs(UnmanagedType.IUnknown)]object? site);void GetSite(ref Guid id,out IntPtr site);}
 [ComVisible(true),Guid("00000114-0000-0000-C000-000000000046"),InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]public interface IOleWindow {void GetWindow(out IntPtr hwnd);void ContextSensitiveHelp([MarshalAs(UnmanagedType.Bool)]bool enter);}
 
-[ComVisible(true),Guid("8A04DBB7-7A32-4922-A95A-C33FAC9E733B"),ClassInterface(ClassInterfaceType.None)]
+[ComVisible(true),Guid(IntegrationIds.PreviewClass),ClassInterface(ClassInterfaceType.None)]
 public sealed class PreviewHandler : IPreviewHandler,IInitializeWithFile,IInitializeWithStream,IObjectWithSite,IOleWindow
 {
     IntPtr parent;Rect bounds;PreviewControl? view;string? file,temp;object? site;

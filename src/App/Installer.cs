@@ -17,6 +17,11 @@ static class Installer
     {
         var source=AppContext.BaseDirectory;
         if(!File.Exists(Path.Combine(source,"shell","Whatsinthebox.Bridge.dll")))throw new IOException(L.T("extension.missing"));
+        // A loaded earlier Shell factory survives registry edits. New class identities
+        // let Explorer activate the native bridge without restarting the user's desktop.
+        using(var previous=Registry.CurrentUser.OpenSubKey($@"Software\Classes\CLSID\{IntegrationIds.PreviousPreview}"))
+        using(var previousThumbnail=Registry.CurrentUser.OpenSubKey($@"Software\Classes\CLSID\{IntegrationIds.PreviousThumbnail}"))
+            if(previous!=null||previousThumbnail!=null)Uninstall();
         Directory.CreateDirectory(Root);string bin=inPlace?source:Path.Combine(Root,"app",Updates.Current.ToString());Directory.CreateDirectory(bin);
         if(!Path.GetFullPath(source).TrimEnd('\\').Equals(Path.GetFullPath(bin).TrimEnd('\\'),StringComparison.OrdinalIgnoreCase))foreach(var file in Directory.EnumerateFiles(source,"*",SearchOption.AllDirectories)){var target=Path.Combine(bin,Path.GetRelativePath(source,file));Directory.CreateDirectory(Path.GetDirectoryName(target)!);File.Copy(file,target,true);}
         var targets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
@@ -47,7 +52,7 @@ static class Installer
             if(backups.Any(x=>x.Path.Equals(pair.Key,StringComparison.OrdinalIgnoreCase)))continue;
             using var key=Registry.CurrentUser.OpenSubKey(pair.Key);string? original=key?.GetValue("",null,RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
             var kind=key?.GetValueNames().Contains("")==true?key.GetValueKind(""):RegistryValueKind.String;
-            if(original is IntegrationIds.LegacyPreview or IntegrationIds.Preview or IntegrationIds.Thumbnail)
+            if(original is IntegrationIds.LegacyPreview or IntegrationIds.Preview or IntegrationIds.Thumbnail or IntegrationIds.PreviousPreview or IntegrationIds.PreviousThumbnail)
             {
                 string? ext=SupportedFiles.All.FirstOrDefault(e=>pair.Key.Equals($@"Software\Classes\{e}\shellex\{IntegrationIds.PreviewInterface}",StringComparison.OrdinalIgnoreCase));
                 original=ext!=null&&legacy.TryGetValue(ext,out var previous)?previous:null;
@@ -115,7 +120,7 @@ static class Installer
             }
             File.Delete(legacyFile);
         }
-        foreach(var id in new[]{IntegrationIds.Preview,IntegrationIds.Thumbnail,IntegrationIds.LegacyPreview})
+        foreach(var id in new[]{IntegrationIds.Preview,IntegrationIds.Thumbnail,IntegrationIds.LegacyPreview,IntegrationIds.PreviousPreview,IntegrationIds.PreviousThumbnail})
         {
             Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\CLSID\{id}",false);
             if(id!=IntegrationIds.LegacyPreview)Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\AppID\{id}",false);

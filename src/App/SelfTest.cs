@@ -76,7 +76,7 @@ static class SelfTest
                 fitForm.Show();Application.DoEvents();using var screenshot=new Bitmap(imageCanvas.Width,imageCanvas.Height);imageCanvas.DrawToBitmap(screenshot,imageCanvas.ClientRectangle);
                 int left=screenshot.Width,top=screenshot.Height,right=-1,bottom=-1;
                 for(int y=0;y<screenshot.Height;y++)for(int x=0;x<screenshot.Width;x++){var pixel=screenshot.GetPixel(x,y);if(pixel.R>245&&pixel.G is >150 and <180&&pixel.B<10){left=Math.Min(left,x);right=Math.Max(right,x);top=Math.Min(top,y);bottom=Math.Max(bottom,y);}}
-                int width=right-left+1,height=bottom-top+1;var expected=PreviewGeometry.Fit(dimensions.Item1,dimensions.Item2,dimensions.Item3-32,dimensions.Item4-32,true);
+                int width=right-left+1,height=bottom-top+1;var expected=PreviewGeometry.Fit(dimensions.Item1,dimensions.Item2,dimensions.Item3-16,dimensions.Item4-16,true);
                 bool fits=width>0&&height>0&&Math.Abs(width-expected.Width)<=3&&Math.Abs(height-expected.Height)<=3;
                 results.Add(new{name=$"actual UI fit {dimensions}",passed=fits,width,height});if(!fits)failed++;
                 screenshot.Save(Path.Combine(Path.GetDirectoryName(report)!, $"fit-{dimensions.Item1}x{dimensions.Item2}-{dimensions.Item3}x{dimensions.Item4}.png"));fitForm.Close();

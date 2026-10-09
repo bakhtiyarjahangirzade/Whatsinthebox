@@ -23,6 +23,9 @@ if(!(Test-Path (Join-Path $compiler 'ISCC.exe'))){throw 'Compiler missing'}
 $old=Join-Path $vendor 'Whatsinthebox-0.6.0-Setup.exe'
 Invoke-WebRequest 'https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v0.6.0/Whatsinthebox-0.6.0-Setup.exe' -OutFile $old
 if((Get-FileHash $old -Algorithm SHA256).Hash -ne '81a36efb5a0610a6c2eb5629a01cc889b5d8bf4bae88f3edbc2bcdb1ccbbbbb2'){throw 'Published baseline checksum mismatch'}
+$previous=Join-Path $vendor 'Whatsinthebox-1.0.0-Setup.exe'
+Invoke-WebRequest 'https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v1.0.0/Whatsinthebox-1.0.0-Setup.exe' -OutFile $previous
+if((Get-FileHash $previous -Algorithm SHA256).Hash -ne 'a4be900f44ea040bcd3a0963a88a2a3867891d9677d4c731d716084145bcb305'){throw 'Previous stable installer checksum mismatch'}
 # The runner administrator token is unsuitable for per-user Shell registrations.
 # Exercise the application as an ordinary user, as the per-user installer does.
 $name='WhatsintheboxTest'

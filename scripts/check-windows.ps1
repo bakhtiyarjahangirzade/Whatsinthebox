@@ -42,7 +42,7 @@ try {
  RunCheck 'refresh-thumbnail' $app @('--refresh-thumbnail',('"'+(Join-Path $evidence 'fixture.pdf')+'"'),('"'+(Join-Path $evidence 'thumbnail-refresh.json')+'"'))
  foreach($iteration in 1..3){RunCheck ('repeat-shell-'+$iteration) $tests @(('"'+(Join-Path $evidence ('repeat-shell-'+$iteration+'.json'))+'"'),'--system-host',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))}
  RunCheck 'unregister' $app @('--unregister')
- $exists=Test-Path -LiteralPath 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'
+ $exists=Test-Path -LiteralPath 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'
  $startup=(Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  $results.Add(@{name='registration-cleanup';passed=!$exists -and !$startup})
  if($exists -or $startup){throw 'Registration cleanup failed'}

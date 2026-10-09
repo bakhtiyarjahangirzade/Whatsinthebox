@@ -1,5 +1,5 @@
 ﻿#ifndef AppVersion
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #endif
 [Setup]
 #ifdef QA_LAYOUT
@@ -257,7 +257,8 @@ begin
      MaintenancePage.Add(CustomMessage('setup_repair'))
    else MaintenancePage.Add(CustomMessage('setup_newer'));
    MaintenancePage.SelectedValueIndex := 0;
-   if not RegKeyExists(HKCU64, 'Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}') and
+   if not RegKeyExists(HKCU64, 'Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}') and
+     not RegKeyExists(HKCU64, 'Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}') and
      (Pos('/TASKS=', Uppercase(GetCmdTail)) = 0) and (Pos('/MERGETASKS=', Uppercase(GetCmdTail)) = 0) then
      WizardSelectTasks('');
  end;

@@ -42,7 +42,7 @@ function RemoveInstall([string]$name){
  Run $name $uninstaller @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/LOG="'+(Join-Path $evidence ($name+'.log'))+'"'))
  Assert ($name+' uninstall entry removed') (!(Test-Path -LiteralPath $uninstallKey))
  Assert ($name+' prior thumbnail restored') ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq $sentinel)
- Assert ($name+' class removed') (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
+ Assert ($name+' class removed') (!(Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'))
  $startup=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  Assert ($name+' startup removed') (!$startup)
 }
@@ -61,7 +61,7 @@ try {
    $before=InstalledExe
    Install 'same-version-repair' $setup
    Assert 'repair uses a fresh binary directory' ((InstalledExe) -ne $before)
-   Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}')
+   Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}')
    $missing=InstalledExe
    Run 'stop-helper-before-file-loss' (Join-Path $env:WINDIR 'System32/WindowsPowerShell/v1.0/powershell.exe') @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',('"'+(Join-Path $root 'installer/StopHelper.ps1')+'"'))
    Move-Item -LiteralPath $missing -Destination ($missing+'.test-backup')
@@ -69,7 +69,7 @@ try {
    finally{Move-Item -LiteralPath ($missing+'.test-backup') -Destination $missing}
    Run 'disable-integration' (InstalledExe) @('--unregister')
    Install 'disabled-repair' $setup 'en' $false
-   Assert 'repair preserves disabled integration' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
+   Assert 'repair preserves disabled integration' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'))
   }
   RemoveInstall ('remove-'+$language)
  }
@@ -87,6 +87,27 @@ try {
  $helpers=@(Get-CimInstance Win32_Process -Filter "Name='Whatsinthebox.exe'" | Where-Object {$_.CommandLine -like '*--windows-host*'})
  Assert 'only one startup helper' ($helpers.Count -le 1)
  RemoveInstall 'remove-upgraded-install'
+ # Hold the previous native DLL loaded throughout the upgrade, as Explorer does.
+ # A new class identity must select the new bridge without unloading this handle.
+ Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class HeldBridge { [DllImport("kernel32", CharSet=CharSet.Unicode)] public static extern IntPtr LoadLibrary(string name); [DllImport("kernel32")] public static extern bool FreeLibrary(IntPtr handle); }'
+ Install 'previous-stable' (Join-Path $root 'artifacts/vendor/Whatsinthebox-1.0.0-Setup.exe')
+ $heldPath=Join-Path (Split-Path (InstalledExe)) 'shell/Whatsinthebox.Bridge.dll'
+ $held=[HeldBridge]::LoadLibrary($heldPath)
+ Assert 'previous bridge held loaded' ($held -ne [IntPtr]::Zero)
+ try{
+  Install 'upgrade-with-previous-bridge-loaded' $setup
+  Assert 'previous preview class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{8A04DBB7-7A32-4922-A95A-C33FAC9E733B}'))
+  Assert 'previous thumbnail class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
+  Assert 'new thumbnail class active' ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq '{916D5157-F38C-4068-A7E9-613E8E6DFD64}')
+  $newBridge=(Get-Item 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}\InprocServer32').GetValue('')
+  Assert 'new bridge path selected' ($newBridge -ne $heldPath -and (Test-Path -LiteralPath $newBridge))
+  $fixture=Join-Path $evidence 'migration.pdf'
+  Run 'migration fixture' (InstalledExe) @('--write-test-pdf',('"'+$fixture+'"'))
+  [IO.File]::WriteAllText((Join-Path (Split-Path (InstalledExe)) 'test-capture.flag'),$fixture)
+  Run 'native pipeline after held-bridge upgrade' (Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe') @(('"'+(Join-Path $evidence 'migration-native.json')+'"'),'--system-host',('"'+$fixture+'"'))
+  Assert 'old bridge file preserved while loaded' (Test-Path -LiteralPath $heldPath)
+ }finally{if($held -ne [IntPtr]::Zero){[HeldBridge]::FreeLibrary($held) | Out-Null}}
+ RemoveInstall 'remove-migrated-install'
  $events=@(Get-WinEvent -FilterHashtable @{LogName='Application';Id=1000,1001;StartTime=$started} -ErrorAction SilentlyContinue | Where-Object {$_.Message -match '(?i)Whatsinthebox|explorer.exe|StartMenuExperienceHost|ShellExperienceHost'})
  ConvertTo-Json -InputObject @($events | Select-Object TimeCreated,Id,Message) -Depth 5 | Set-Content (Join-Path $evidence 'application-events.json')
  Assert 'no application or shell crash events during installer journeys' ($events.Count -eq 0)

@@ -107,7 +107,7 @@ public sealed class ImageCanvas : Control
     public bool HasImage=>image!=null;
     public void Fit(){fit=true;Invalidate();}
     public void ZoomBy(float multiplier){if(image==null)return;if(fit)zoom=FitScale();fit=false;zoom=Math.Clamp(zoom*multiplier,0.03f,8f);Invalidate();Focus();}
-    float FitScale()=>image==null?1:Math.Min(Math.Max(1,Width-32)/(float)image.Width,Math.Max(1,Height-32)/(float)image.Height);
+    float FitScale()=>image==null?1:Math.Min(Math.Max(1,Width-16)/(float)image.Width,Math.Max(1,Height-16)/(float)image.Height);
     protected override bool IsInputKey(Keys key)=>key is Keys.Add or Keys.Subtract or Keys.Oemplus or Keys.OemMinus or Keys.D0||base.IsInputKey(key);
     protected override void OnKeyDown(KeyEventArgs e){base.OnKeyDown(e);if(e.KeyCode is Keys.Add or Keys.Oemplus)ZoomBy(1.25f);if(e.KeyCode is Keys.Subtract or Keys.OemMinus)ZoomBy(0.8f);if(e.KeyCode==Keys.D0)Fit();}
     protected override void OnMouseWheel(MouseEventArgs e){base.OnMouseWheel(e);ZoomBy(e.Delta>0?1.15f:0.87f);}
