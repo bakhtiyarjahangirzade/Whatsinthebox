@@ -31,7 +31,7 @@ public sealed class PreviewControl : UserControl
         var brandRow=new Panel{Dock=DockStyle.Top,Height=32};
         var brand=new Label {Text="Whatsinthebox",Dock=DockStyle.Fill,Font=UiStyle.Font(13,FontStyle.Bold),ForeColor=Theme.Primary,Padding=new Padding(8,0,0,0)};
         brandRow.Controls.Add(brand);
-        string uiFolder=Path.GetDirectoryName(typeof(PreviewControl).Assembly.Location)!;
+        string uiFolder=Path.GetDirectoryName(HostActivity.Renderer(typeof(PreviewControl).Assembly))!;
         string imagePath=Path.Combine(uiFolder,"logo.png");if(!File.Exists(imagePath))imagePath=Path.GetFullPath(Path.Combine(uiFolder,"..","logo.png"));
         if(File.Exists(imagePath)){using var original=Image.FromFile(imagePath);var icon=new PictureBox{Image=new Bitmap(original),SizeMode=PictureBoxSizeMode.Zoom,Dock=DockStyle.Left,Width=32};icon.Disposed+=(_,_)=>icon.Image?.Dispose();brandRow.Controls.Add(icon);}
         title.Text=L.T("file.select"); title.Dock=DockStyle.Bottom;title.Height=25;title.AutoEllipsis=true;
