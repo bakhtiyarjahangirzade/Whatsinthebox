@@ -7,6 +7,8 @@ if(!$Context){
  $taskName='Whatsinthebox-Explorer-'+[guid]::NewGuid().ToString('N')
  $contextFile=Join-Path $env:RUNNER_TEMP ($taskName+'.json')
  $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+ icacls $root /grant ('*'+$sid+':(OI)(CI)M') /T /Q | Out-Null
+ if($LASTEXITCODE -ne 0){throw 'Interactive user artifact permissions could not be granted'}
  @{authorized=$true;sid=$sid;result=(Join-Path $evidence 'desktop-task-result.json')} | ConvertTo-Json | Set-Content -LiteralPath $contextFile
  $action=New-ScheduledTaskAction -Execute (Join-Path $PSHOME 'pwsh.exe') -Argument ('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$contextFile+'"')
  $principal=New-ScheduledTaskPrincipal -UserId $sid -LogonType Interactive -RunLevel Limited
