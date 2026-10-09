@@ -26,6 +26,8 @@ jobs:
         run: |
           ISCC installer/Setup.iss
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
+          ISCC /DQA_LAYOUT /DQA_REVIEW /Oartifacts/installer-ui /FSetupUI installer/Setup.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Wizard test compilation failed' }
       - name: Isolated Windows lifecycle and shell checks
         shell: pwsh
         run: ./scripts/run-isolated.ps1 -Script check-windows.ps1
@@ -33,6 +35,10 @@ jobs:
         if: ${{ !cancelled() }}
         shell: pwsh
         run: ./scripts/run-isolated.ps1 -Script check-installer.ps1
+      - name: Five-language installer interface
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: ./scripts/run-isolated.ps1 -Script check-installer-ui.ps1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,4 +1,6 @@
-﻿#define AppVersion "0.6.3"
+﻿#ifndef AppVersion
+#define AppVersion "0.6.3"
+#endif
 [Setup]
 #ifdef QA_LAYOUT
 AppId={{4550FDF8-3F77-46AE-A439-7960CA00E9B4}
@@ -15,7 +17,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\artifacts\installer
-OutputBaseFilename=Whatsinthebox-0.6.3-Setup
+OutputBaseFilename=Whatsinthebox-{#AppVersion}-Setup
 SetupIconFile=..\src\App\app.ico
 UninstallDisplayIcon={app}\{code:InstallBin}\Whatsinthebox.exe
 UninstallDisplayName=Whatsinthebox
@@ -250,6 +252,7 @@ begin
 
 #ifdef QA_LAYOUT
   if not WizardForm.WizardBitmapImage2.Visible then RaiseException('Finish portrait rail not visible');
+  if (WizardForm.RunList.Items.Count <> 2) or not WizardForm.RunList.Checked[1] then RaiseException('Repository option must be checked by default');
   SaveStringToFile(RemoveQuotes(ExpandConstant('{param:QALAYOUT|}')), 'portrait-rail-visible=true; github-default-checked=true; no-runlist-overlap=true; language=' + ActiveLanguage, False);
 #ifndef QA_REVIEW
   WizardForm.RunList.Checked[0] := False; WizardForm.RunList.Checked[1] := False;

@@ -1,4 +1,4 @@
-param([ValidateSet('check-windows.ps1','check-installer.ps1')][string]$Script)
+param([ValidateSet('check-windows.ps1','check-installer.ps1','check-installer-ui.ps1')][string]$Script)
 $ErrorActionPreference='Stop'
 if($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows'){throw 'Only isolated runners may run this launcher.'}
 $root=Split-Path $PSScriptRoot -Parent

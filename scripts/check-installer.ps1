@@ -1,6 +1,9 @@
 $ErrorActionPreference='Stop'
 if($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows'){throw 'Installer tests require an isolated Windows runner.'}
-$env:LOCALAPPDATA=[Environment]::GetFolderPath('LocalApplicationData')
+$profileKey='HKLM:\Software\Microsoft\Windows NT\CurrentVersion\ProfileList\'+[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+$env:USERPROFILE=[Environment]::ExpandEnvironmentVariables((Get-ItemProperty -LiteralPath $profileKey).ProfileImagePath)
+$env:LOCALAPPDATA=Join-Path $env:USERPROFILE 'AppData/Local'
+$env:APPDATA=Join-Path $env:USERPROFILE 'AppData/Roaming'
 $env:TEMP=Join-Path $env:LOCALAPPDATA 'Temp'
 $env:TMP=$env:TEMP
 New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
