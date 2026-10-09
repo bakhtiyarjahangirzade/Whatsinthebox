@@ -1,5 +1,9 @@
 $ErrorActionPreference='Stop'
 if($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows'){throw 'This script requires an isolated GitHub Windows runner. Do not run it on a working desktop.'}
+$env:LOCALAPPDATA=[Environment]::GetFolderPath('LocalApplicationData')
+$env:TEMP=Join-Path $env:LOCALAPPDATA 'Temp'
+$env:TMP=$env:TEMP
+New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
 $root=Split-Path $PSScriptRoot -Parent
 $evidence=Join-Path $root 'artifacts\windows-checks'
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
