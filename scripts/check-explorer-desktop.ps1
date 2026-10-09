@@ -26,19 +26,20 @@ $authorized=Get-Content -LiteralPath $Context -Raw | ConvertFrom-Json
 if(!$authorized.authorized -or $authorized.sid -ne [Security.Principal.WindowsIdentity]::GetCurrent().User.Value){throw 'Invalid isolated desktop context'}
 $env:GITHUB_ACTIONS='true';$env:RUNNER_OS='Windows'
 $currentPrincipal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
-if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
+$uac=(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System').EnableLUA
+if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -and $uac -eq 1){
  Add-Type -Path (Join-Path $PSScriptRoot 'DesktopToken.cs')
  $exit=[DesktopToken]::Run((Join-Path $PSHOME 'pwsh.exe'),('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$Context+'"'),$root)
  if($exit -ne 0){throw 'Restricted desktop worker failed'}
  exit
 }
 $app=Join-Path $root 'artifacts/app/Whatsinthebox.exe';$tests=Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe';$fixtures=Join-Path $evidence 'desktop-fixtures'
-function Run([string]$file,[string[]]$arguments){$p=Start-Process -FilePath $file -ArgumentList $arguments -PassThru;$handle=$p.Handle;if(!$p.WaitForExit(150000)){Stop-Process -Id $p.Id -Force;throw 'Desktop command timed out'};if($p.ExitCode -ne 0){throw ('Desktop command failed '+$p.ExitCode)}}
+function Run([string]$file,[string[]]$arguments){Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value ('Starting '+[IO.Path]::GetFileName($file)+' '+$arguments[0]);$p=Start-Process -FilePath $file -ArgumentList $arguments -PassThru;$handle=$p.Handle;if(!$p.WaitForExit(150000)){Stop-Process -Id $p.Id -Force;throw 'Desktop command timed out'};if($p.ExitCode -ne 0){throw ('Desktop command failed '+$p.ExitCode)};Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value 'Completed'}
 $success=$false;$errorText=$null
 try{
  $identity=[Security.Principal.WindowsIdentity]::GetCurrent();$principal=[Security.Principal.WindowsPrincipal]::new($identity)
- @{user=$identity.Name;session=[Diagnostics.Process]::GetCurrentProcess().SessionId;administrator=$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)} | ConvertTo-Json | Set-Content (Join-Path $evidence 'desktop-token.json')
- if($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'Desktop test must run without administrator privileges'}
+ @{user=$identity.Name;session=[Diagnostics.Process]::GetCurrentProcess().SessionId;administrator=$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator);uac=$uac;scenario=$(if($uac -eq 0){'interactive desktop with UAC disabled'}else{'interactive desktop with limited token'})} | ConvertTo-Json | Set-Content (Join-Path $evidence 'desktop-token.json')
+ if($uac -eq 1 -and $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'UAC-enabled desktop test must run without administrator privileges'}
  Run $app @('--register')
  Run $app @('--write-explorer-fixtures',('"'+$fixtures+'"'))
  [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'test-capture.flag'),'*')
