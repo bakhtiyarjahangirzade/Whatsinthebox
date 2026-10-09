@@ -23,3 +23,13 @@ if(!(Test-Path (Join-Path $compiler 'ISCC.exe'))){throw 'Compiler missing'}
 $old=Join-Path $vendor 'Whatsinthebox-0.6.0-Setup.exe'
 Invoke-WebRequest 'https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v0.6.0/Whatsinthebox-0.6.0-Setup.exe' -OutFile $old
 if((Get-FileHash $old -Algorithm SHA256).Hash -ne '81a36efb5a0610a6c2eb5629a01cc889b5d8bf4bae88f3edbc2bcdb1ccbbbbb2'){throw 'Published baseline checksum mismatch'}
+# The runner administrator token is unsuitable for per-user Shell registrations.
+# Exercise the application as an ordinary user, as the per-user installer does.
+$name='WhatsintheboxTest'
+$password=ConvertTo-SecureString ('Witb!'+[guid]::NewGuid().ToString('N')+'aA9') -AsPlainText -Force
+New-LocalUser -Name $name -Password $password -AccountNeverExpires -PasswordNeverExpires | Out-Null
+Add-LocalGroupMember -SID 'S-1-5-32-545' -Member $name
+$credential=[pscredential]::new(($env:COMPUTERNAME+'\'+$name),$password)
+$credential | Export-Clixml (Join-Path $env:RUNNER_TEMP 'whatsinthebox-test-user.xml')
+icacls $root /grant ($name+':(OI)(CI)M') /T /Q | Out-Null
+if($LASTEXITCODE -ne 0){throw 'Test directory access could not be granted'}

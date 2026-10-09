@@ -3,6 +3,7 @@ if($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows'){throw 'This 
 $root=Split-Path $PSScriptRoot -Parent
 $evidence=Join-Path $root 'artifacts\windows-checks'
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
+whoami /groups | Set-Content (Join-Path $evidence 'runner-token.txt')
 $app=Join-Path $root 'artifacts\app\Whatsinthebox.exe'
 $tests=Join-Path $root 'artifacts\windows-tests\Whatsinthebox.Tests.exe'
 $results=[Collections.Generic.List[object]]::new()

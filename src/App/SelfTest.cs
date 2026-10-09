@@ -54,7 +54,21 @@ static class SelfTest
             using(var releases=JsonDocument.Parse("[{\"tag_name\":\"v9.0.0-rc.1\",\"draft\":false,\"prerelease\":false,\"assets\":[{\"name\":\"Whatsinthebox-9.0.0-Setup.exe\",\"browser_download_url\":\"https://github.com/bakhtiyarjahangirzade/Whatsinthebox/releases/download/v9.0.0-rc.1/Whatsinthebox-9.0.0-Setup.exe\"}]}]")){bool ok=Updates.Select(releases.RootElement).State=="current";results.Add(new{name="release-candidate tag rejected even if mislabeled stable",passed=ok});if(!ok)failed++;}
             // Shared actual UI: validate a worker render and a narrow pane without Explorer changes.
             if(includeUi){using var form=new Form{Width=420,Height=600};var preview=new PreviewControl(true){Dock=DockStyle.Fill,RendererPath=Environment.ProcessPath!};form.Controls.Add(preview);form.Show();var load=preview.LoadFileAsync(svg);var until=DateTime.UtcNow.AddSeconds(20);while(!load.IsCompleted&&DateTime.UtcNow<until){Application.DoEvents();Thread.Sleep(20);}bool ui=load.IsCompletedSuccessfully&&preview.HasPreview;results.Add(new{name="shared UI render",passed=ui});if(!ui)failed++;
-            using var shot=new Bitmap(preview.Width,preview.Height);preview.DrawToBitmap(shot,preview.ClientRectangle);shot.Save(Path.ChangeExtension(report,"png"));form.Close();}
+            using var shot=new Bitmap(preview.Width,preview.Height);preview.DrawToBitmap(shot,preview.ClientRectangle);shot.Save(Path.ChangeExtension(report,"png"));form.Close();
+            foreach(var dimensions in new[]{(160,90,800,600),(90,160,420,600),(529,256,650,220),(1600,900,180,600)})
+            {
+                using var fitForm=new Form{ClientSize=new Size(dimensions.Item3,dimensions.Item4)};
+                var imageCanvas=new ImageCanvas{Dock=DockStyle.Fill,BackgroundMode=1};fitForm.Controls.Add(imageCanvas);
+                var source=new Bitmap(dimensions.Item1,dimensions.Item2);using(var g=Graphics.FromImage(source))g.Clear(Color.Orange);imageCanvas.SetImage(source);
+                fitForm.Show();Application.DoEvents();using var screenshot=new Bitmap(imageCanvas.Width,imageCanvas.Height);imageCanvas.DrawToBitmap(screenshot,imageCanvas.ClientRectangle);
+                int left=screenshot.Width,top=screenshot.Height,right=-1,bottom=-1;
+                for(int y=0;y<screenshot.Height;y++)for(int x=0;x<screenshot.Width;x++){var pixel=screenshot.GetPixel(x,y);if(pixel.R>245&&pixel.G is >150 and <180&&pixel.B<10){left=Math.Min(left,x);right=Math.Max(right,x);top=Math.Min(top,y);bottom=Math.Max(bottom,y);}}
+                int width=right-left+1,height=bottom-top+1;var expected=PreviewGeometry.Fit(dimensions.Item1,dimensions.Item2,dimensions.Item3-32,dimensions.Item4-32,true);
+                bool fits=width>0&&height>0&&Math.Abs(width-expected.Width)<=3&&Math.Abs(height-expected.Height)<=3;
+                results.Add(new{name=$"actual UI fit {dimensions}",passed=fits,width,height});if(!fits)failed++;
+                screenshot.Save(Path.Combine(Path.GetDirectoryName(report)!, $"fit-{dimensions.Item1}x{dimensions.Item2}-{dimensions.Item3}x{dimensions.Item4}.png"));fitForm.Close();
+            }
+            }
             File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
         }
         finally{try{Directory.Delete(root,true);}catch{}}

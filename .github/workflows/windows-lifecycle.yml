@@ -28,10 +28,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
       - name: Isolated Windows lifecycle and shell checks
         shell: pwsh
-        run: ./scripts/check-windows.ps1
+        run: ./scripts/run-isolated.ps1 -Script check-windows.ps1
       - name: Installer user journeys
+        if: ${{ !cancelled() }}
         shell: pwsh
-        run: ./scripts/check-installer.ps1
+        run: ./scripts/run-isolated.ps1 -Script check-installer.ps1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
