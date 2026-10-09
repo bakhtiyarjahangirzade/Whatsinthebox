@@ -11,7 +11,7 @@ internal static class Updates
  internal static Version? Parse(string? tag)=>Version.TryParse(tag?.TrimStart('v').Split('-')[0],out var version)?version:null;
  internal static UpdateResult Select(JsonElement releases)
  {
-  foreach(var release in releases.EnumerateArray().Where(x=>!x.GetProperty("draft").GetBoolean()).OrderByDescending(x=>Parse(x.GetProperty("tag_name").GetString())??new Version(0,0)))
+  foreach(var release in releases.EnumerateArray().Where(x=>!x.GetProperty("draft").GetBoolean()&&(!x.TryGetProperty("prerelease",out var prerelease)||!prerelease.GetBoolean())).OrderByDescending(x=>Parse(x.GetProperty("tag_name").GetString())??new Version(0,0)))
   {
    var version=Parse(release.GetProperty("tag_name").GetString());if(version==null)continue;
    var asset=release.GetProperty("assets").EnumerateArray().FirstOrDefault(x=>x.GetProperty("name").GetString()==$"Whatsinthebox-{version}-Setup.exe");
