@@ -171,6 +171,7 @@ function VersionValue(Value: String): Int64;
 var Parts: array[0..3] of Integer; I, Dot: Integer; Segment: String;
 begin
   Result := -1;
+  if Value = '' then Exit;
   for I := 0 to 3 do begin
     Dot := Pos('.', Value);
     if Dot = 0 then begin Segment := Value; Value := ''; end

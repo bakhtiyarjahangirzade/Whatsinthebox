@@ -63,6 +63,7 @@ try {
    Assert 'repair uses a fresh binary directory' ((InstalledExe) -ne $before)
    Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}')
    $missing=InstalledExe
+   Run 'stop-helper-before-file-loss' (Join-Path $env:WINDIR 'System32/WindowsPowerShell/v1.0/powershell.exe') @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',('"'+(Join-Path $root 'installer/StopHelper.ps1')+'"'))
    Move-Item -LiteralPath $missing -Destination ($missing+'.test-backup')
    try{Install 'missing-executable-repair' $setup;Assert 'repair recovers missing executable' (Test-Path -LiteralPath (InstalledExe))}
    finally{Move-Item -LiteralPath ($missing+'.test-backup') -Destination $missing}
