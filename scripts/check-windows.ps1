@@ -44,7 +44,7 @@ try {
  $explorerFixtures=Join-Path $evidence 'explorer-fixtures'
  RunCheck 'explorer-fixtures' $app @('--write-explorer-fixtures',('"'+$explorerFixtures+'"'))
  [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'test-capture.flag'),'*')
- RunCheck 'actual-explorer' $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$explorerFixtures+'"')) 360
+ RunCheck 'actual-explorer' $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$explorerFixtures+'"')) 180
  RunCheck 'unregister' $app @('--unregister')
  $exists=Test-Path -LiteralPath 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'
  $startup=(Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
