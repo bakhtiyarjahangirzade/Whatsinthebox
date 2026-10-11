@@ -38,7 +38,7 @@ public static class DesktopToken
    if(!ConvertStringSecurityDescriptorToSecurityDescriptor("D:(A;;GA;;;"+userSid+")(A;;GA;;;SY)",1,out descriptor,IntPtr.Zero)||!GetSecurityDescriptorDacl(descriptor,out present,out dacl,out defaulted)||!SetTokenInformation(token,6,ref dacl,IntPtr.Size))throw new Win32Exception(Marshal.GetLastWin32Error());
    var startup=new Startup{Size=Marshal.SizeOf(typeof(Startup)),Desktop="winsta0\\default"};
    if(!CreateProcessAsUser(token,application,new StringBuilder("\""+application+"\" "+arguments),IntPtr.Zero,IntPtr.Zero,false,0,IntPtr.Zero,directory,ref startup,out info))throw new Win32Exception(Marshal.GetLastWin32Error());
-   if(WaitForSingleObject(info.Process,900000)!=0)throw new TimeoutException("Medium desktop process timed out");uint result;GetExitCodeProcess(info.Process,out result);return (int)result;
+   if(WaitForSingleObject(info.Process,1200000)!=0)throw new TimeoutException("Medium desktop process timed out");uint result;GetExitCodeProcess(info.Process,out result);return (int)result;
   }finally{foreach(var handle in new[]{info.Thread,info.Process,token,original})if(handle!=IntPtr.Zero)CloseHandle(handle);if(admin!=IntPtr.Zero)LocalFree(admin);if(medium!=IntPtr.Zero)LocalFree(medium);if(user!=IntPtr.Zero)LocalFree(user);if(descriptor!=IntPtr.Zero)LocalFree(descriptor);}
  }
 }

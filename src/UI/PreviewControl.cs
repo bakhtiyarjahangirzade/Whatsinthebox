@@ -84,10 +84,11 @@ public sealed class PreviewControl : UserControl
             SetPages(info.PageCount);
             using var loaded=Image.FromFile(png);canvas.SetImage(new Bitmap(loaded));canvas.Caption="";
             status.Text=$"{info.Width:N0} × {info.Height:N0} {L.T("pixels")} • {info.Mode}\n{info.Message}";
+            TestCapture.Trace(RendererPath,$"rendered {Path.GetFileName(path)} {info.Width}x{info.Height} view={Width}x{Height} visible={Visible}");
             if(CaptureEnabled(path)){using var shot=new Bitmap(Math.Max(1,Width),Math.Max(1,Height));DrawToBitmap(shot,ClientRectangle);shot.Save(Path.Combine(PreviewStorage.Root,"embedded-test.png"));File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=true,source=CaptureSource(path),width=Width,height=Height,imageWidth=info.Width,imageHeight=info.Height,process=Environment.ProcessId,thread=Environment.CurrentManagedThreadId}));}
         }
         catch(OperationCanceledException){}
-        catch(Exception ex) {if(version==generation&&!IsDisposed){canvas.Caption=L.T("preview.failed");canvas.Invalidate();status.Text=ex is PreviewFailure or TimeoutException?ex.Message:L.T("preview.generic");SetPages(pageCount);if(CaptureEnabled(path))File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=false,source=CaptureSource(path),error=status.Text}));}}
+        catch(Exception ex) {TestCapture.Trace(RendererPath,"load failure "+ex.GetType().Name+": "+ex.Message);if(version==generation&&!IsDisposed){canvas.Caption=L.T("preview.failed");canvas.Invalidate();status.Text=ex is PreviewFailure or TimeoutException?ex.Message:L.T("preview.generic");SetPages(pageCount);if(CaptureEnabled(path))File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=false,source=CaptureSource(path),error=status.Text}));}}
         finally {if(version==generation)loading=false;try{Directory.Delete(dir,true);}catch{}}
     }
     protected override void Dispose(bool disposing){if(disposing){generation++;cancellation?.Cancel();cancellation?.Dispose();}base.Dispose(disposing);}

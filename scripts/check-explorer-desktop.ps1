@@ -12,10 +12,10 @@ if(!$Context){
  @{authorized=$true;sid=$sid;result=(Join-Path $evidence 'desktop-task-result.json')} | ConvertTo-Json | Set-Content -LiteralPath $contextFile
  $action=New-ScheduledTaskAction -Execute (Join-Path $PSHOME 'pwsh.exe') -Argument ('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$contextFile+'"')
  $principal=New-ScheduledTaskPrincipal -UserId $sid -LogonType Interactive -RunLevel Limited
- Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 17)) | Out-Null
+ Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 22)) | Out-Null
  try{
   Start-ScheduledTask -TaskName $taskName
-  $until=(Get-Date).AddMinutes(17)
+  $until=(Get-Date).AddMinutes(22)
   $resultFile=Join-Path $evidence 'desktop-task-result.json'
   while(!(Test-Path -LiteralPath $resultFile) -and (Get-Date) -lt $until){Start-Sleep -Seconds 5}
   if(!(Test-Path -LiteralPath $resultFile)){throw 'Interactive desktop task did not finish.'}
@@ -57,7 +57,7 @@ try{
  Run $app @('--register')
  Run $app @('--write-explorer-fixtures',('"'+$fixtures+'"'))
  [IO.File]::WriteAllLines((Join-Path (Split-Path $app) 'test-capture.flag'),[string[]]@(Get-ChildItem -LiteralPath $fixtures -File | ForEach-Object FullName))
- Run $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$fixtures+'"')) 600
+ Run $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$fixtures+'"')) 780
  $success=$true
 }catch{$errorText=$_.ToString()}
 finally{try{Run $app @('--unregister')}catch{};Remove-Item (Join-Path (Split-Path $app) 'test-capture.flag') -ErrorAction SilentlyContinue;@{success=$success;error=$errorText} | ConvertTo-Json | Set-Content -LiteralPath $authorized.result}

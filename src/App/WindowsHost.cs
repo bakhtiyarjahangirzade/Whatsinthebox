@@ -17,7 +17,7 @@ public sealed class WindowsFactory : IClassFactory
  public int CreateInstance(IntPtr outer,in Guid iid,out IntPtr obj)
  {
   obj=IntPtr.Zero;if(outer!=IntPtr.Zero)return unchecked((int)0x80040110);
-   try{WindowsHost.LastRequest=DateTime.UtcNow;object instance=thumbnail?new ThumbnailProvider():new PreviewHandler();IntPtr unknown=Marshal.GetIUnknownForObject(instance);try{return Marshal.QueryInterface(unknown,in iid,out obj);}finally{Marshal.Release(unknown);}}catch(Exception ex){return Marshal.GetHRForException(ex);}
+   try{WindowsHost.LastRequest=DateTime.UtcNow;object instance=thumbnail?new ThumbnailProvider():new PreviewHandler();IntPtr unknown=Marshal.GetIUnknownForObject(instance);try{int hr=Marshal.QueryInterface(unknown,in iid,out obj);TestCapture.Trace(Environment.ProcessPath??"",$"factory {(thumbnail?"thumbnail":"preview")} iid={iid} hr=0x{hr:X8}");return hr;}finally{Marshal.Release(unknown);}}catch(Exception ex){TestCapture.Trace(Environment.ProcessPath??"","factory failure "+ex);return Marshal.GetHRForException(ex);}
  }
  public int LockServer(bool locked){WindowsHost.LastRequest=DateTime.UtcNow;return 0;}
 }
@@ -44,6 +44,7 @@ static class WindowsHost
     try{Marshal.ThrowExceptionForHR(CoRegisterClassObject(in id,unknown,4,5,out uint cookie));cookies.Add(cookie);}finally{Marshal.Release(unknown);}
    }
    Marshal.ThrowExceptionForHR(CoResumeClassObjects());
+   TestCapture.Trace(Environment.ProcessPath??"","host registered session="+System.Diagnostics.Process.GetCurrentProcess().SessionId);
    using var maintenanceCancellation=new CancellationTokenSource();
    if(refreshExisting)
    {

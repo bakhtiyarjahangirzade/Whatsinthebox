@@ -28,4 +28,10 @@ public static class TestCapture
         string? target=Match(rendererPath,path,sourceName);if(target==null)return;
         try{File.AppendAllText(Path.Combine(PreviewStorage.Root,"thumbnail-test.log"),JsonSerializer.Serialize(new{source=Path.GetFileName(target),edge,width,height,sourceWidth,sourceHeight,process=Environment.ProcessId,time=DateTime.UtcNow})+Environment.NewLine);}catch{}
     }
+    // Integration-test trace of the Shell calls the handler receives; inactive without a flag file.
+    public static void Trace(string rendererPath,string message)
+    {
+        if(Targets(rendererPath).Length==0)return;
+        try{File.AppendAllText(Path.Combine(PreviewStorage.Root,"handler-trace.log"),DateTime.UtcNow.ToString("O")+" pid="+Environment.ProcessId+" "+message+Environment.NewLine);}catch{}
+    }
 }
