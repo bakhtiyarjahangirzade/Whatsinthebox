@@ -352,7 +352,7 @@ namespace
         IFACEMETHODIMP ContextSensitiveHelp(BOOL) override { return E_NOTIMPL; }
 
         IFACEMETHODIMP SetBackgroundColor(COLORREF color) override { background = color; if (window) InvalidateRect(window, nullptr, FALSE); return S_OK; }
-        IFACEMETHODIMP SetFont(const LOGFONTW* value) override { if (!value) return E_INVALIDARG; if (font) DeleteObject(font); LOGFONTW small = *value; font = CreateFontIndirectW(&small); return S_OK; }
+        IFACEMETHODIMP SetFont(const LOGFONTW* value) override { if (!value) return E_INVALIDARG; if (font) DeleteObject(font); LOGFONTW copy = *value; font = CreateFontIndirectW(&copy); return S_OK; }
         IFACEMETHODIMP SetTextColor(COLORREF color) override { text = color; return S_OK; }
     };
 
