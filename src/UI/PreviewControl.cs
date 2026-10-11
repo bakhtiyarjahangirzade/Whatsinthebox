@@ -84,15 +84,16 @@ public sealed class PreviewControl : UserControl
             SetPages(info.PageCount);
             using var loaded=Image.FromFile(png);canvas.SetImage(new Bitmap(loaded));canvas.Caption="";
             status.Text=$"{info.Width:N0} × {info.Height:N0} {L.T("pixels")} • {info.Mode}\n{info.Message}";
-            if(CaptureEnabled(path)){using var shot=new Bitmap(Math.Max(1,Width),Math.Max(1,Height));DrawToBitmap(shot,ClientRectangle);shot.Save(Path.Combine(PreviewStorage.Root,"embedded-test.png"));File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=true,width=Width,height=Height,thread=Environment.CurrentManagedThreadId}));}
+            if(CaptureEnabled(path)){using var shot=new Bitmap(Math.Max(1,Width),Math.Max(1,Height));DrawToBitmap(shot,ClientRectangle);shot.Save(Path.Combine(PreviewStorage.Root,"embedded-test.png"));File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=true,source=CaptureSource(path),width=Width,height=Height,imageWidth=info.Width,imageHeight=info.Height,process=Environment.ProcessId,thread=Environment.CurrentManagedThreadId}));}
         }
         catch(OperationCanceledException){}
-        catch(Exception ex) {if(version==generation&&!IsDisposed){canvas.Caption=L.T("preview.failed");canvas.Invalidate();status.Text=ex is PreviewFailure or TimeoutException?ex.Message:L.T("preview.generic");SetPages(pageCount);if(CaptureEnabled(path))File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=false,error=status.Text}));}}
+        catch(Exception ex) {if(version==generation&&!IsDisposed){canvas.Caption=L.T("preview.failed");canvas.Invalidate();status.Text=ex is PreviewFailure or TimeoutException?ex.Message:L.T("preview.generic");SetPages(pageCount);if(CaptureEnabled(path))File.WriteAllText(Path.Combine(PreviewStorage.Root,"embedded-test.json"),JsonSerializer.Serialize(new{success=false,source=CaptureSource(path),error=status.Text}));}}
         finally {if(version==generation)loading=false;try{Directory.Delete(dir,true);}catch{}}
     }
     protected override void Dispose(bool disposing){if(disposing){generation++;cancellation?.Cancel();cancellation?.Dispose();}base.Dispose(disposing);}
     public bool HasPreview=>canvas.HasImage&&!loading;
-    bool CaptureEnabled(string input){string marker=Path.Combine(Path.GetDirectoryName(RendererPath)!,"test-capture.flag");if(!File.Exists(marker))return false;string value=File.ReadAllText(marker).Trim();return value.Equals(Path.GetFullPath(input),StringComparison.OrdinalIgnoreCase)||(value=="*"&&Environment.GetEnvironmentVariable("GITHUB_ACTIONS")=="true");}
+    bool CaptureEnabled(string input)=>TestCapture.Match(RendererPath,input,currentName)!=null;
+    string CaptureSource(string input)=>Path.GetFileName(TestCapture.Match(RendererPath,input,currentName)??input);
 }
 
 public sealed class ImageCanvas : Control

@@ -22,6 +22,7 @@ static class Program
         if(args.Length>=4&&args[0]=="--render")return Renderer.Run(args[1],args[2],args[3],args.Length>4?int.Parse(args[4]):0);
         if(args.Length>0&&args[0]=="--register"){try{Installer.Install(true);return 0;}catch(Exception ex){File.WriteAllText(Path.Combine(AppContext.BaseDirectory,"setup-error.txt"),ex.Message);return 1;}}
         if(args.Length>0&&args[0]=="--unregister"){try{Installer.Uninstall();return 0;}catch{return 1;}}
+        if(args.Length==2&&args[0]=="--diagnose-associations"){try{Installer.WriteDiagnostics(args[1]);return 0;}catch{return 1;}}
         if(args.Contains("--stop-windows-host")){WindowsHost.Stop();return 0;}
         if(args.Length==2&&args[0]=="--write-test-pdf"){File.WriteAllBytes(args[1],SelfTest.MakePdf());return 0;}
         if(args.Length==2&&args[0]=="--write-explorer-fixtures"){SelfTest.WriteExplorerFixtures(args[1]);return 0;}

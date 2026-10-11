@@ -41,9 +41,9 @@ static class Installer
         {
             targets[$@"Software\Classes\{ext}\shellex\{iid}"]=clsid;
             targets[$@"Software\Classes\SystemFileAssociations\{ext}\shellex\{iid}"]=clsid;
-            using var choice=Registry.CurrentUser.OpenSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{ext}\UserChoice");
             using var fileType=Registry.ClassesRoot.OpenSubKey(ext);
-            foreach(var progId in new[]{choice?.GetValue("ProgId") as string,fileType?.GetValue("") as string}.Where(x=>!string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
+            // The Shell checks the default-app ProgID before the extension key.
+            foreach(var progId in Associations.UserProgIds(ext).Append(fileType?.GetValue("") as string??"").Where(x=>!string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
                 targets[$@"Software\Classes\{progId}\shellex\{iid}"]=clsid;
         }
         string legacyFile=Path.Combine(Root,"associations.json");var legacy=File.Exists(legacyFile)?JsonSerializer.Deserialize<Dictionary<string,string?>>(File.ReadAllText(legacyFile))!:new();
@@ -67,6 +67,11 @@ static class Installer
             {
                 using var cls=Registry.CurrentUser.CreateSubKey($@"Software\Classes\CLSID\{id}");cls.SetValue("","Whatsinthebox Windows extension");
                 if(id==IntegrationIds.Preview)cls.SetValue("AppID","{6D2B5079-2F0B-48DD-AB7F-97CEC514D30B}");else cls.DeleteValue("AppID",false);
+                // The native preview factory only forwards to this user's medium-integrity
+                // local server, where all parsing happens in job-limited worker processes.
+                // A low-integrity Preview Host is not allowed to activate that server, so
+                // the forwarding factory must run in the medium Preview Host instance.
+                if(id==IntegrationIds.Preview)cls.SetValue("DisableLowILProcessIsolation",1,RegistryValueKind.DWord);else cls.DeleteValue("DisableLowILProcessIsolation",false);
                 Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\AppID\{id}",false);
                 using var local=cls.CreateSubKey("LocalServer32");local.SetValue("",$"\"{Path.Combine(bin,"Whatsinthebox.exe")}\" --windows-host");local.SetValue("ServerExecutable",Path.Combine(bin,"Whatsinthebox.exe"));
                 // Only the native forwarding factory runs in the caller. Windows 11's
@@ -81,6 +86,7 @@ static class Installer
             Notify();
             if(!EffectiveHandler(".pdf",IntegrationIds.PreviewInterface).Equals(IntegrationIds.Preview,StringComparison.OrdinalIgnoreCase))throw new IOException(L.T("registration.failed"));
             if(!EffectiveHandler(".pdf",IntegrationIds.ThumbnailInterface).Equals(IntegrationIds.Thumbnail,StringComparison.OrdinalIgnoreCase))throw new IOException(L.T("registration.failed"));
+            WriteDiagnostics();
             using(var options=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"))
             {
                 string backup=Path.Combine(Root,"preview-options-backup.json");
@@ -150,6 +156,18 @@ static class Installer
             using var list=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\PreviewHandlers",true);list?.DeleteValue(id,false);
         }
         Notify();
+    }
+    // Read-only record of what Explorer resolves for each format after registration.
+    public static void WriteDiagnostics(string? output=null)
+    {
+        try
+        {
+            string folder=Path.Combine(Root,"association-check");
+            var rows=SupportedFiles.ImageExtensions.Concat(new[]{".pdf",".ai",".ttf",".otf"}).Distinct().Select(x=>Associations.Inspect(x,folder)).ToArray();
+            try{Directory.Delete(folder,true);}catch{}
+            File.WriteAllText(output??Path.Combine(Root,"association-diagnostics.json"),JsonSerializer.Serialize(new{version=Updates.Current.ToString(),preview=IntegrationIds.Preview,thumbnail=IntegrationIds.Thumbnail,rows},new JsonSerializerOptions{WriteIndented=true}));
+        }
+        catch(Exception ex){if(output!=null)throw;try{File.WriteAllText(Path.Combine(Root,"association-diagnostics.json"),JsonSerializer.Serialize(new{error=ex.Message}));}catch{}}
     }
     public static string EffectiveHandler(string extension,string iid)
     {

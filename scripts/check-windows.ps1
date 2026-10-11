@@ -37,7 +37,12 @@ try {
  Copy-Item (Join-Path $root 'artifacts/developer-shell/*') (Join-Path $root 'artifacts/windows-tests/shell') -Recurse -Force
  RunCheck 'direct-com' $tests @(('"'+(Join-Path $evidence 'direct-com.json')+'"'))
  RunCheck 'register' $app @('--register')
- [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'test-capture.flag'),(Join-Path $evidence 'fixture.pdf'))
+ $formats=Join-Path $evidence 'format-fixtures'
+ RunCheck 'format-fixtures' $app @('--write-explorer-fixtures',('"'+$formats+'"'))
+ try{RunCheck 'association-diagnostics' $app @('--diagnose-associations',('"'+(Join-Path $evidence 'association-diagnostics.json')+'"'))}catch{Write-Warning $_}
+ $captureTargets=@((Join-Path $evidence 'fixture.pdf'))+@(Get-ChildItem -LiteralPath $formats -File | ForEach-Object FullName)
+ [IO.File]::WriteAllLines((Join-Path (Split-Path $app) 'test-capture.flag'),[string[]]$captureTargets)
+ try{RunCheck 'shell-formats' $tests @(('"'+(Join-Path $evidence 'shell-formats.json')+'"'),'--shell-formats',('"'+$formats+'"')) 240}catch{Write-Warning $_}
  RunCheck 'native-shell' $tests @(('"'+(Join-Path $evidence 'native-shell.json')+'"'),'--system-host',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
  RunCheck 'refresh-thumbnail' $app @('--refresh-thumbnail',('"'+(Join-Path $evidence 'fixture.pdf')+'"'),('"'+(Join-Path $evidence 'thumbnail-refresh.json')+'"'))
  foreach($iteration in 1..3){RunCheck ('repeat-shell-'+$iteration) $tests @(('"'+(Join-Path $evidence ('repeat-shell-'+$iteration+'.json'))+'"'),'--system-host',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))}

@@ -29,6 +29,7 @@ static class Program
   if(args.Length==3&&args[1]=="--thumbnails-only")return SystemHostTests.Run(report,args[2],true);
   if(args.Length==3&&args[1]=="--system-host")return SystemHostTests.Run(report,args[2]);
   if(args.Length==3&&args[1]=="--explorer")return ExplorerTests.Run(report,args[2]);
+  if(args.Length==3&&args[1]=="--shell-formats")return ShellFormatTests.Run(report,args[2]);
   var root=Path.Combine(Path.GetTempPath(),"Whatsinthebox-COM-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
   try
   {

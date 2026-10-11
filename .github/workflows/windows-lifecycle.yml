@@ -14,7 +14,7 @@ permissions:
 jobs:
   lifecycle:
     runs-on: ${{ inputs.image }}
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

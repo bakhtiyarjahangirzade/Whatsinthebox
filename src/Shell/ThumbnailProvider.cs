@@ -11,11 +11,11 @@ public interface IThumbnailProvider {void GetThumbnail(uint edge,out IntPtr bitm
 [ComVisible(true),Guid(IntegrationIds.ThumbnailClass),ClassInterface(ClassInterfaceType.None)]
 public sealed class ThumbnailProvider : IThumbnailProvider,IInitializeWithStream,IInitializeWithFile
 {
- string? file,temp;
- public void Initialize(string path,uint mode){file=path;}
+ string? file,temp,sourceName;
+ public void Initialize(string path,uint mode){file=path;sourceName=Path.GetFileName(path);}
  public void Initialize(IStream stream,uint mode)
  {
-  stream.Stat(out var stat,0);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new IOException(L.T("input.limit"));
+  stream.Stat(out var stat,0);sourceName=string.IsNullOrWhiteSpace(stat.pwcsName)?null:Path.GetFileName(stat.pwcsName);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new IOException(L.T("input.limit"));
   string extension=Path.GetExtension(stat.pwcsName??"").ToLowerInvariant();if(!SupportedFiles.All.Contains(extension))extension=".witb";
   temp=Path.Combine(PreviewStorage.Root,Guid.NewGuid().ToString("N")+extension);
   using var output=File.Create(temp);var buffer=new byte[65536];var count=Marshal.AllocCoTaskMem(4);
@@ -35,6 +35,7 @@ public sealed class ThumbnailProvider : IThumbnailProvider,IInitializeWithStream
    if(!File.Exists(json)||JsonSerializer.Deserialize<RenderInfo>(File.ReadAllText(json))?.Success!=true)throw new IOException(L.T("thumbnail.failed"));
    using var source=Image.FromFile(png);int size=(int)Math.Clamp(edge,1,1024);var dimensions=PreviewGeometry.Fit(source.Width,source.Height,size,size,true);int width=dimensions.Width,height=dimensions.Height;
    using var image=new Bitmap(width,height);using(var g=Graphics.FromImage(image)){g.Clear(Color.White);g.InterpolationMode=System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;g.DrawImage(source,0,0,width,height);}bitmap=image.GetHbitmap();
+   TestCapture.RecordThumbnail(exe,file,sourceName,edge,width,height,source.Width,source.Height);
   }
   finally{try{Directory.Delete(directory,true);}catch{}}
  }

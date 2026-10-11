@@ -17,11 +17,11 @@ namespace Whatsinthebox.Shell;
 [ComVisible(true),Guid(IntegrationIds.PreviewClass),ClassInterface(ClassInterfaceType.None)]
 public sealed class PreviewHandler : IPreviewHandler,IInitializeWithFile,IInitializeWithStream,IObjectWithSite,IOleWindow
 {
-    IntPtr parent;Rect bounds;PreviewControl? view;string? file,temp;object? site;
-    public void Initialize(string path,uint mode){file=path;}
+    IntPtr parent;Rect bounds;PreviewControl? view;string? file,temp,sourceName;object? site;
+    public void Initialize(string path,uint mode){file=path;sourceName=Path.GetFileName(path);}
     public void Initialize(IStream stream,uint mode)
     {
-        stream.Stat(out var stat,0);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new COMException(L.T("input.limit"),unchecked((int)0x800700DF));
+        stream.Stat(out var stat,0);sourceName=string.IsNullOrWhiteSpace(stat.pwcsName)?null:Path.GetFileName(stat.pwcsName);var local=PreviewInput.LocalStreamFile(stat.pwcsName,stat.cbSize);if(local!=null){file=local;return;}if(stat.cbSize>256L*1024*1024)throw new COMException(L.T("input.limit"),unchecked((int)0x800700DF));
         string suffix=Path.GetExtension(stat.pwcsName??"").ToLowerInvariant();if(!SupportedFiles.All.Contains(suffix))suffix=".witb";
         var root=PreviewStorage.Root;temp=Path.Combine(root,Guid.NewGuid().ToString("N")+suffix);
         using var output=File.Create(temp);var buffer=new byte[65536];IntPtr read=Marshal.AllocCoTaskMem(4);
@@ -35,9 +35,9 @@ public sealed class PreviewHandler : IPreviewHandler,IInitializeWithFile,IInitia
         if(HostDispatcher.Dispatch(DoPreview))return;
         if(file==null||parent==IntPtr.Zero)return;
         if(view!=null){view.Dispose();HostActivity.Closed();}view=new PreviewControl {RendererPath=HostActivity.Renderer(typeof(PreviewHandler).Assembly)};HostActivity.Opened();
-        view.CreateControl();SetParent(view.Handle,parent);SetWindowLongPtr(view.Handle,-16,new IntPtr(0x40000000|0x10000000|0x02000000|0x04000000));Resize();view.Show();_=view.LoadFileAsync(file,temp!=null?L.T("file.selected"):null);
+        view.CreateControl();SetParent(view.Handle,parent);SetWindowLongPtr(view.Handle,-16,new IntPtr(0x40000000|0x10000000|0x02000000|0x04000000));Resize();view.Show();_=view.LoadFileAsync(file,temp!=null?(sourceName??L.T("file.selected")):null);
     }
-    public void Unload(){if(HostDispatcher.Dispatch(Unload))return;if(view!=null){view.Dispose();HostActivity.Closed();}view=null;file=null;if(temp!=null){try{File.Delete(temp);}catch{}temp=null;}}
+    public void Unload(){if(HostDispatcher.Dispatch(Unload))return;if(view!=null){view.Dispose();HostActivity.Closed();}view=null;file=null;sourceName=null;if(temp!=null){try{File.Delete(temp);}catch{}temp=null;}}
     public void SetFocus(){if(HostDispatcher.Dispatch(SetFocus))return;view?.Focus();}
     public void QueryFocus(out IntPtr hwnd){IntPtr value=IntPtr.Zero;if(HostDispatcher.Dispatch(()=>value=GetFocus())){hwnd=value;return;}hwnd=GetFocus();}
     public int TranslateAccelerator(ref Msg msg)=>1;

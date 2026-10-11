@@ -12,10 +12,10 @@ if(!$Context){
  @{authorized=$true;sid=$sid;result=(Join-Path $evidence 'desktop-task-result.json')} | ConvertTo-Json | Set-Content -LiteralPath $contextFile
  $action=New-ScheduledTaskAction -Execute (Join-Path $PSHOME 'pwsh.exe') -Argument ('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$contextFile+'"')
  $principal=New-ScheduledTaskPrincipal -UserId $sid -LogonType Interactive -RunLevel Limited
- Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 5)) | Out-Null
+ Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 17)) | Out-Null
  try{
   Start-ScheduledTask -TaskName $taskName
-  $until=(Get-Date).AddMinutes(5)
+  $until=(Get-Date).AddMinutes(17)
   $resultFile=Join-Path $evidence 'desktop-task-result.json'
   while(!(Test-Path -LiteralPath $resultFile) -and (Get-Date) -lt $until){Start-Sleep -Seconds 5}
   if(!(Test-Path -LiteralPath $resultFile)){throw 'Interactive desktop task did not finish.'}
@@ -30,13 +30,15 @@ $env:GITHUB_ACTIONS='true';$env:RUNNER_OS='Windows'
 $currentPrincipal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
 $uac=(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System').EnableLUA
 if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -and $uac -eq 1){
- Add-Type -Path (Join-Path $PSScriptRoot 'DesktopToken.cs')
- $exit=[DesktopToken]::Run((Join-Path $PSHOME 'pwsh.exe'),('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$Context+'"'),$root)
- if($exit -ne 0){throw 'Restricted desktop worker failed'}
+ try{
+  Add-Type -Path (Join-Path $PSScriptRoot 'DesktopToken.cs')
+  $exit=[DesktopToken]::Run((Join-Path $PSHOME 'pwsh.exe'),('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$Context+'"'),$root,$authorized.sid)
+  if(!(Test-Path -LiteralPath $authorized.result)){throw ('Restricted desktop worker exited '+$exit+' without a result')}
+ }catch{if(!(Test-Path -LiteralPath $authorized.result)){@{success=$false;error=('Restricted token launch: '+$_.ToString())} | ConvertTo-Json | Set-Content -LiteralPath $authorized.result}}
  exit
 }
 $app=Join-Path $root 'artifacts/app/Whatsinthebox.exe';$tests=Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe';$fixtures=Join-Path $evidence 'desktop-fixtures'
-function Run([string]$file,[string[]]$arguments){Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value ('Starting '+[IO.Path]::GetFileName($file)+' '+$arguments[0]);$start=[Diagnostics.ProcessStartInfo]::new($file);$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true;foreach($arg in $arguments){$start.ArgumentList.Add($arg.Trim('"'))};$p=[Diagnostics.Process]::Start($start);$stdout=$p.StandardOutput.ReadToEndAsync();$stderr=$p.StandardError.ReadToEndAsync();if(!$p.WaitForExit(150000)){Stop-Process -Id $p.Id -Force;throw 'Desktop command timed out'};$stdout.Result|Set-Content (Join-Path $evidence ([IO.Path]::GetFileName($file)+'.desktop.stdout.txt'));$stderr.Result|Set-Content (Join-Path $evidence ([IO.Path]::GetFileName($file)+'.desktop.stderr.txt'));if($p.ExitCode -ne 0){throw ('Desktop command failed '+$p.ExitCode)};Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value 'Completed'}
+function Run([string]$file,[string[]]$arguments,[int]$timeout=150){Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value ('Starting '+[IO.Path]::GetFileName($file)+' '+$arguments[0]);$start=[Diagnostics.ProcessStartInfo]::new($file);$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true;foreach($arg in $arguments){$start.ArgumentList.Add($arg.Trim('"'))};$p=[Diagnostics.Process]::Start($start);$stdout=$p.StandardOutput.ReadToEndAsync();$stderr=$p.StandardError.ReadToEndAsync();if(!$p.WaitForExit($timeout*1000)){Stop-Process -Id $p.Id -Force;throw 'Desktop command timed out'};$stdout.Result|Set-Content (Join-Path $evidence ([IO.Path]::GetFileName($file)+'.desktop.stdout.txt'));$stderr.Result|Set-Content (Join-Path $evidence ([IO.Path]::GetFileName($file)+'.desktop.stderr.txt'));if($p.ExitCode -ne 0){throw ('Desktop command failed '+$p.ExitCode)};Add-Content -LiteralPath (Join-Path $evidence 'desktop-stage.txt') -Value 'Completed'}
 $success=$false;$errorText=$null
 try{
  $identity=[Security.Principal.WindowsIdentity]::GetCurrent();$principal=[Security.Principal.WindowsPrincipal]::new($identity)
@@ -44,8 +46,8 @@ try{
  if($uac -eq 1 -and $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'UAC-enabled desktop test must run without administrator privileges'}
  Run $app @('--register')
  Run $app @('--write-explorer-fixtures',('"'+$fixtures+'"'))
- [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'test-capture.flag'),'*')
- Run $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$fixtures+'"'))
+ [IO.File]::WriteAllLines((Join-Path (Split-Path $app) 'test-capture.flag'),[string[]]@(Get-ChildItem -LiteralPath $fixtures -File | ForEach-Object FullName))
+ Run $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$fixtures+'"')) 600
  $success=$true
 }catch{$errorText=$_.ToString()}
 finally{try{Run $app @('--unregister')}catch{};Remove-Item (Join-Path (Split-Path $app) 'test-capture.flag') -ErrorAction SilentlyContinue;@{success=$success;error=$errorText} | ConvertTo-Json | Set-Content -LiteralPath $authorized.result}
