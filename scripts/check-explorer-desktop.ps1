@@ -58,6 +58,13 @@ if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administr
  exit
 }
 $label=[string]$authorized.label
+# Processes started with alternate credentials can inherit the caller's profile
+# variables; use this account's own folders, as a sign-in would.
+$profileKey='HKLM:\Software\Microsoft\Windows NT\CurrentVersion\ProfileList\'+[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+$env:USERPROFILE=[Environment]::ExpandEnvironmentVariables((Get-ItemProperty -LiteralPath $profileKey).ProfileImagePath)
+$env:LOCALAPPDATA=Join-Path $env:USERPROFILE 'AppData\Local';$env:APPDATA=Join-Path $env:USERPROFILE 'AppData\Roaming'
+$env:TEMP=Join-Path $env:LOCALAPPDATA 'Temp';$env:TMP=$env:TEMP
+New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
 $app=Join-Path $root 'artifacts/app/Whatsinthebox.exe';$tests=Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe';$fixtures=Join-Path $evidence ('desktop-fixtures'+$label)
 # Output goes to files, not pipes: --register starts the long-lived Windows host, which
 # inherits the caller's standard handles; a pipe would then never reach end-of-file.

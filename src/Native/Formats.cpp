@@ -62,6 +62,7 @@ namespace witb
         if (!src.ReadAt(0, signature, 4) || memcmp(signature, "8BPS", 4) || !src.BE16(version) || (version != 1 && version != 2)) return E_FAIL;
         if (!src.Skip(6) || !src.BE16(channels) || !src.BE32(height) || !src.BE32(width) || !src.BE16(depth) || !src.BE16(mode)) return E_FAIL;
         if (!width || !height || !channels || channels > 56 || (depth != 1 && depth != 8 && depth != 16 && depth != 32)) return E_FAIL;
+        if (width > 300000 || height > 300000 || uint64_t(channels) * height > 20000000ull) return E_FAIL;
         bool big = version == 2;
         uint32_t length;
         // Color mode data holds the palette for indexed images.
@@ -107,6 +108,7 @@ namespace witb
                 {
                     uint32_t n = counts[size_t(c) * height + y];
                     if (!wanted) { if (!src.Skip(n)) return E_FAIL; continue; }
+                    if (n > rowBytes * 2 + 1024) return E_FAIL;
                     packed.resize(n);
                     if (!src.Read(packed.data(), n)) return E_FAIL;
                     PackBits(packed.data(), n, row.data(), rowBytes);
@@ -185,7 +187,7 @@ namespace witb
         bool ZipRead(Source& src, const ZipEntry& entry, std::vector<uint8_t>& data)
         {
             uint8_t local[30];
-            if (entry.size > (256u << 20) || !src.ReadAt(entry.offset, local, 30) || LE32(local) != 0x04034b50) return false;
+            if (entry.size > (256u << 20) || entry.compressed > (256u << 20) || !src.ReadAt(entry.offset, local, 30) || LE32(local) != 0x04034b50) return false;
             uint64_t start = uint64_t(entry.offset) + 30 + LE16(local + 26) + LE16(local + 28);
             std::vector<uint8_t> raw(entry.compressed);
             if (!src.ReadAt(start, raw.data(), raw.size())) return false;
@@ -263,7 +265,7 @@ namespace witb
         if (!src.ReadAll(data, 512ull << 20) || data.size() < 22) return E_FAIL;
         uint32_t w = uint32_t(data[4]) << 24 | data[5] << 16 | data[6] << 8 | data[7];
         uint32_t h = uint32_t(data[8]) << 24 | data[9] << 16 | data[10] << 8 | data[11];
-        if (!w || !h || uint64_t(w) * h > 400000000ull) return E_FAIL;
+        if (!w || !h || uint64_t(w) * h > 64000000ull) return E_FAIL;
         std::vector<uint8_t> rgba(size_t(w) * h * 4);
         uint8_t index[64][4] = {}; uint8_t px[4] = { 0, 0, 0, 255 };
         size_t p = 14, run = 0, end = data.size() - 8;
@@ -296,7 +298,7 @@ namespace witb
         uint16_t mapFirst = LE16(&d[3]), mapLength = LE16(&d[5]); uint8_t mapBits = d[7];
         uint16_t w = LE16(&d[12]), h = LE16(&d[14]); uint8_t bits = d[16], descriptor = d[17];
         bool rle = type >= 9; uint8_t base = rle ? type - 8 : type;
-        if (!w || !h || (base != 1 && base != 2 && base != 3) || mapType > 1) return E_FAIL;
+        if (!w || !h || uint64_t(w) * h > 64000000ull || (base != 1 && base != 2 && base != 3) || mapType > 1) return E_FAIL;
         size_t p = 18 + idLength;
         std::vector<uint8_t> map;
         if (mapType == 1) { size_t mapBytes = size_t(mapLength) * ((mapBits + 7) / 8); if (p + mapBytes > d.size()) return E_FAIL; map.assign(d.begin() + p, d.begin() + p + mapBytes); p += mapBytes; }
@@ -350,7 +352,7 @@ namespace witb
             return true;
         };
         long w, h, maxval = 1;
-        if (!number(w) || !number(h) || w <= 0 || h <= 0 || (kind != 1 && kind != 4 && !number(maxval)) || maxval <= 0 || maxval > 65535) return E_FAIL;
+        if (!number(w) || !number(h) || w <= 0 || h <= 0 || uint64_t(w) * uint64_t(h) > 64000000ull || (kind != 1 && kind != 4 && !number(maxval)) || maxval <= 0 || maxval > 65535) return E_FAIL;
         if (kind >= 4) p++;
         int components = (kind == 3 || kind == 6) ? 3 : 1;
         std::vector<uint8_t> rgba(size_t(w) * h * 4);
