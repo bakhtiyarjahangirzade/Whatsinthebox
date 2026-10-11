@@ -7,6 +7,7 @@ static class Program
   if(args.Length==3&&args[1]=="--system-host")return SystemHostTests.Run(args[0],args[2]);
   if(args.Length==3&&args[1]=="--shell-formats")return ShellFormatTests.Run(args[0],args[2]);
   if(args.Length==3&&args[1]=="--explorer")return ExplorerTests.Run(args[0],args[2]);
+  if(args.Length==3&&args[1]=="--folder-view")return ExplorerBrowserTests.Run(args[0],args[2]);
   Console.Error.WriteLine("usage: Whatsinthebox.Tests <report.json> --system-host|--shell-formats|--explorer <path>");
   return 2;
  }
