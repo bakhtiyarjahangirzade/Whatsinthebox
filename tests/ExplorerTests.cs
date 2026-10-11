@@ -77,8 +77,7 @@ static class ExplorerTests
                 if(hwnd==IntPtr.Zero){failed++;results.Add(new{name="Actual Explorer window "+ext,passed=false,error="No new Explorer folder window appeared"});continue;}
                 GetWindowThreadProcessId(hwnd,out uint windowProcess);
                 ShowWindow(hwnd,9);MoveWindow(hwnd,0,0,1400,900,true);SetForegroundWindow(hwnd);
-                // Explorer only reads the stored pane state for some windows; show it explicitly.
-                Thread.Sleep(1500);SetForegroundWindow(hwnd);SendKeys.SendWait("%p");Stage("pressed Alt+P for "+name);
+                Thread.Sleep(1500);SetForegroundWindow(hwnd);
                 // Large icons, so the folder view itself asks for thumbnails.
                 SendKeys.SendWait("^+2");
                 bool rendered=false,toggled=false;JsonElement? record=null;until=DateTime.UtcNow.AddSeconds(ours?35:8);
@@ -86,8 +85,9 @@ static class ExplorerTests
                 {
                     Thread.Sleep(200);
                     record=Capture.Read("preview",file);
-                    if(record!=null){rendered=Capture.Succeeded(record);break;}
-                    if(ours&&!toggled&&DateTime.UtcNow>until.AddSeconds(-18)&&!ChildTree(hwnd).Any(x=>x.Contains("WhatsintheboxPreviewWindow"))){SetForegroundWindow(hwnd);SendKeys.SendWait("%p");toggled=true;Stage("no preview window yet, toggled pane again for "+name);}
+                    if(record!=null){rendered=Capture.Succeeded(record);Thread.Sleep(1500);break;}
+                    // Explorer does not always open with the stored pane state; show the pane once if no preview appeared.
+                    if(ours&&!toggled&&DateTime.UtcNow>until.AddSeconds(-30)&&!ChildTree(hwnd).Any(x=>x.Contains("WhatsintheboxPreviewWindow"))){SetForegroundWindow(hwnd);SendKeys.SendWait("%p");toggled=true;Stage("showed the preview pane for "+name);}
                 }
                 Thread.Sleep(700);
                 string shot=Path.ChangeExtension(report,ext.TrimStart('.')+"-explorer.png");

@@ -31,6 +31,10 @@ $currentPrincipal=[Security.Principal.WindowsPrincipal]::new([Security.Principal
 $uac=(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System').EnableLUA
 if($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) -and $uac -eq 1){
  try{
+  # The runner's own shell is elevated; a thumbnail surrogate it started cannot
+  # see per-user classes. Close it so the medium-integrity Explorer under test
+  # starts its own, as on an ordinary PC.
+  Get-CimInstance Win32_Process -Filter "Name='dllhost.exe'" | Where-Object {$_.CommandLine -like '*AB8902B4-09CA-4BB6-B78D-A8F59079A8D5*'} | ForEach-Object {Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue}
   Add-Type -Path (Join-Path $PSScriptRoot 'DesktopToken.cs')
   $exit=[DesktopToken]::Run((Join-Path $PSHOME 'pwsh.exe'),('-NoProfile -File "'+$PSCommandPath+'" -Context "'+$Context+'"'),$root,$authorized.sid)
   if(!(Test-Path -LiteralPath $authorized.result)){throw ('Restricted desktop worker exited '+$exit+' without a result')}
