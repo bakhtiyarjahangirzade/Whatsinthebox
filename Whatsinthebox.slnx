@@ -1,7 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/App/App.csproj" />
-    <Project Path="src/Shell/Shell.csproj" />
     <Project Path="src/UI/UI.csproj" />
   </Folder>
   <Folder Name="/tests/">

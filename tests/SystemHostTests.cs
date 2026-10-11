@@ -1,59 +1,66 @@
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
-using Whatsinthebox.Shell;
 using Whatsinthebox.UI;
+// Activates the registered native classes the way Windows does: the thumbnail
+// provider in process, the preview handler out of process in Preview Host.
 static class SystemHostTests
 {
  [DllImport("ole32.dll")]static extern int CoCreateInstance(in Guid clsid,IntPtr outer,uint context,in Guid iid,out IntPtr obj);
- [DllImport("ole32.dll")]static extern int CoInitializeEx(IntPtr reserved,uint flags);
- [DllImport("user32.dll")]static extern bool PrintWindow(IntPtr hwnd,IntPtr dc,uint flags);
- [DllImport("user32.dll",SetLastError=true)]static extern IntPtr SendMessageTimeout(IntPtr hwnd,uint message,IntPtr wp,IntPtr lp,uint flags,uint timeout,out IntPtr result);
+ [DllImport("shlwapi.dll",CharSet=CharSet.Unicode,ExactSpelling=true)]static extern int SHCreateStreamOnFileEx(string file,uint mode,uint attributes,bool create,IntPtr template,out IntPtr stream);
  [DllImport("gdi32.dll")]static extern bool DeleteObject(IntPtr bitmap);
- [DllImport("shell32.dll",CharSet=CharSet.Unicode)]static extern int SHCreateItemFromParsingName(string path,IntPtr context,in Guid iid,out IntPtr item);
- [StructLayout(LayoutKind.Sequential)]struct NativeSize {public int cx,cy;}
- [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int GetImage(IntPtr self,NativeSize size,uint flags,out IntPtr bitmap);
- [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int InitFile(IntPtr self,[MarshalAs(UnmanagedType.LPWStr)]string path,uint mode);
+ [DllImport("user32.dll")]static extern bool PrintWindow(IntPtr hwnd,IntPtr dc,uint flags);
+ [StructLayout(LayoutKind.Sequential)]struct Rect{public int Left,Top,Right,Bottom;}
+ [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int InitStream(IntPtr self,IntPtr stream,uint mode);
+ [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int GetThumbnail(IntPtr self,uint size,out IntPtr bitmap,out uint alpha);
  [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int SetWindow(IntPtr self,IntPtr parent,ref Rect rect);
  [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int Call(IntPtr self);
- [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int GetWindow(IntPtr self,out IntPtr hwnd);
- [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int GetThumbnail(IntPtr self,uint size,out IntPtr bitmap,out uint alpha);
  static T Method<T>(IntPtr ptr,int slot)where T:Delegate=>Marshal.GetDelegateForFunctionPointer<T>(Marshal.ReadIntPtr(Marshal.ReadIntPtr(ptr),slot*IntPtr.Size));
- public static int Run(string report,string pdf,bool thumbnailsOnly=false)
+ static readonly Guid StreamInit=new("b824b49d-22ac-4161-ac8a-9916e8fa3f7f"),ThumbnailIid=new("e357fccd-a995-4576-b01f-234630154e96"),PreviewIid=new("8895b1c6-b41f-4c1c-a562-0d564250836f");
+ static IntPtr Open(string file){Marshal.ThrowExceptionForHR(SHCreateStreamOnFileEx(file,0x40,0,false,IntPtr.Zero,out var stream));return stream;}
+ public static int Run(string report,string file)
  {
-  void Stage(string value)=>File.WriteAllText(report+".stage",value);
-  var results=new List<object>();int failed=0;int nativeWidth=0,nativeHeight=0;
+  var results=new List<object>();int failed=0;void Add(string name,bool passed,object? detail=null){results.Add(new{name,passed,detail});if(!passed)failed++;}
   try
   {
-   Marshal.ThrowExceptionForHR(CoInitializeEx(IntPtr.Zero,2));
-   Guid cacheClass=new("50ef4544-ac9f-4a8e-b21b-8a26180db13f"),cacheIid=new("f676c15d-596a-4ce2-8234-33996f445db1");
-   int cacheHr=CoCreateInstance(in cacheClass,IntPtr.Zero,1,in cacheIid,out var cache);if(cache!=IntPtr.Zero)Marshal.Release(cache);
-   results.Add(new{name="Windows thumbnail cache available",passed=cacheHr==0,hresult=$"0x{cacheHr:X8}"});if(cacheHr!=0)failed++;
-   string embedded=Path.Combine(PreviewStorage.Root,"embedded-test.json");if(File.Exists(embedded))File.Delete(embedded);
-   Guid thumbClass=new(IntegrationIds.Thumbnail),thumbIid=typeof(IThumbnailProvider).GUID,fileIid=typeof(IInitializeWithFile).GUID;
-   Stage("thumbnail activation");Marshal.ThrowExceptionForHR(CoCreateInstance(in thumbClass,IntPtr.Zero,4,in thumbIid,out var thumbnail));Stage("thumbnail initialization");Marshal.ThrowExceptionForHR(Marshal.QueryInterface(thumbnail,in fileIid,out var input));Marshal.ThrowExceptionForHR(Method<InitFile>(input,3)(input,pdf,0));
-   Stage("thumbnail render");Marshal.ThrowExceptionForHR(Method<GetThumbnail>(thumbnail,3)(thumbnail,256,out var handle,out var alpha));Stage("thumbnail received");
-   using(var image=Image.FromHbitmap(handle)){nativeWidth=image.Width;nativeHeight=image.Height;bool passed=image.Width>20&&image.Height>20;results.Add(new{name="Windows out-of-process PDF thumbnail",passed,width=image.Width,height=image.Height,alpha});if(!passed)failed++;image.Save(Path.ChangeExtension(report,"thumbnail.png"));}DeleteObject(handle);
-   Stage("small thumbnail bounds");Marshal.ThrowExceptionForHR(Method<GetThumbnail>(thumbnail,3)(thumbnail,16,out var smallHandle,out _));
-   try{using var small=Image.FromHbitmap(smallHandle);bool passed=small.Width>0&&small.Height>0&&small.Width<=16&&small.Height<=16&&Math.Abs((double)small.Width*nativeHeight-(double)small.Height*nativeWidth)<=(nativeWidth+nativeHeight)/2d;results.Add(new{name="Small thumbnail respects requested size and source aspect",passed,width=small.Width,height=small.Height});if(!passed)failed++;}finally{DeleteObject(smallHandle);}
-   Marshal.Release(input);Marshal.Release(thumbnail);
-   Guid imageIid=new("bcc18b79-ba16-442f-80c4-8a59c30c463b");Stage("Windows Shell thumbnail pipeline");int shellHr=SHCreateItemFromParsingName(pdf,IntPtr.Zero,in imageIid,out var shell);
-   if(shellHr==0){try{shellHr=Method<GetImage>(shell,3)(shell,new NativeSize{cx=256,cy=256},8,out var shellBitmap);if(shellHr==0){using var shellImage=Image.FromHbitmap(shellBitmap);bool aspect=Math.Abs((double)shellImage.Width/shellImage.Height-(double)nativeWidth/nativeHeight)<0.015;results.Add(new{name="Windows cached thumbnail preserves rendered aspect",passed=aspect,width=shellImage.Width,height=shellImage.Height});if(!aspect)failed++;shellImage.Save(Path.ChangeExtension(report,"shell-thumbnail.png"));DeleteObject(shellBitmap);}}finally{Marshal.Release(shell);}}
-   results.Add(new{name="Windows Shell PDF thumbnail lookup",passed=shellHr==0,hresult=$"0x{shellHr:X8}"});if(shellHr!=0)failed++;
-   if(thumbnailsOnly){File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;}
-   Guid previewClass=new(IntegrationIds.Preview),previewIid=typeof(IPreviewHandler).GUID,oleIid=typeof(IOleWindow).GUID;
-   Stage("native preview bridge activation");Marshal.ThrowExceptionForHR(CoCreateInstance(in previewClass,IntPtr.Zero,1,in previewIid,out var preview));Stage("preview initialization");Marshal.ThrowExceptionForHR(Marshal.QueryInterface(preview,in fileIid,out var initialization));Marshal.ThrowExceptionForHR(Method<InitFile>(initialization,3)(initialization,pdf,0));
-   using var parent=new Form{ClientSize=new Size(650,760),ShowInTaskbar=false,StartPosition=FormStartPosition.Manual,Location=new Point(-3000,-3000)};parent.Show();var rect=new Rect{Right=650,Bottom=760};Stage("preview SetWindow");Marshal.ThrowExceptionForHR(Method<SetWindow>(preview,3)(preview,parent.Handle,ref rect));Stage("preview DoPreview");Marshal.ThrowExceptionForHR(Method<Call>(preview,5)(preview));Stage("preview window");Marshal.ThrowExceptionForHR(Marshal.QueryInterface(preview,in oleIid,out var ole));Marshal.ThrowExceptionForHR(Method<GetWindow>(ole,3)(ole,out var child));
-   bool rendered=false;var until=DateTime.UtcNow.AddSeconds(20);
-   using var shot=new Bitmap(650,760);
-   while(DateTime.UtcNow<until)
+   Guid thumbClass=new(IntegrationIds.Thumbnail);
+   Marshal.ThrowExceptionForHR(CoCreateInstance(in thumbClass,IntPtr.Zero,1,in ThumbnailIid,out var thumbnail));
+   Marshal.ThrowExceptionForHR(Marshal.QueryInterface(thumbnail,in StreamInit,out var init));
+   IntPtr stream=Open(file);Marshal.ThrowExceptionForHR(Method<InitStream>(init,3)(init,stream,0));Marshal.Release(stream);
+   foreach(uint size in new uint[]{256,32})
    {
-    Application.DoEvents();Thread.Sleep(100);Stage("waiting for server-owned preview capture");
-    if(File.Exists(embedded)){using var state=JsonDocument.Parse(File.ReadAllText(embedded));if(state.RootElement.TryGetProperty("success",out var ok)&&ok.GetBoolean()){rendered=true;File.Copy(Path.Combine(PreviewStorage.Root,"embedded-test.png"),Path.ChangeExtension(report,"preview.png"),true);break;}}
+    int hr=Method<GetThumbnail>(thumbnail,3)(thumbnail,size,out var handle,out var alpha);
+    if(hr!=0){Add($"Native thumbnail {size}",false,$"0x{hr:X8}");continue;}
+    using(var image=Image.FromHbitmap(handle)){bool ok=Math.Max(image.Width,image.Height)==size;Add($"Native thumbnail fills {size} box",ok,new{image.Width,image.Height,alpha});if(size==256)image.Save(Path.ChangeExtension(report,"thumbnail.png"));}
+    DeleteObject(handle);
    }
-   results.Add(new{name="Windows out-of-process PDF preview renders",passed=rendered,evidence="server-owned capture after real out-of-process activation"});if(!rendered)failed++;
-   Marshal.ThrowExceptionForHR(Method<Call>(preview,6)(preview));Marshal.Release(ole);Marshal.Release(initialization);Marshal.Release(preview);parent.Close();
+   Marshal.Release(init);Marshal.Release(thumbnail);
   }
-  catch(Exception ex){failed++;results.Add(new{name="Windows preview-host integration",passed=false,error=ex.ToString()});}
+  catch(Exception ex){Add("Native thumbnail activation",false,ex.Message);}
+  try
+  {
+   // CLSCTX_LOCAL_SERVER: COM starts the class in its registered surrogate, Preview Host.
+   Capture.Clear("preview",file);
+   Guid previewClass=new(IntegrationIds.Preview);
+   int created=CoCreateInstance(in previewClass,IntPtr.Zero,4,in PreviewIid,out var preview);
+   Add("Preview Host activates the native preview handler",created==0,$"0x{created:X8}");
+   if(created==0)
+   {
+    Marshal.ThrowExceptionForHR(Marshal.QueryInterface(preview,in StreamInit,out var init));
+    IntPtr stream=Open(file);Marshal.ThrowExceptionForHR(Method<InitStream>(init,3)(init,stream,0));Marshal.Release(stream);
+    using var host=new Form{ClientSize=new Size(420,620),ShowInTaskbar=false,StartPosition=FormStartPosition.Manual,Location=new Point(20,20)};host.Show();
+    var rect=new Rect{Right=420,Bottom=620};
+    Marshal.ThrowExceptionForHR(Method<SetWindow>(preview,3)(preview,host.Handle,ref rect));
+    Marshal.ThrowExceptionForHR(Method<Call>(preview,5)(preview));
+    JsonElement? record=null;var until=DateTime.UtcNow.AddSeconds(20);
+    while(record==null&&DateTime.UtcNow<until){Application.DoEvents();Thread.Sleep(100);record=Capture.Read("preview",file);}
+    for(int i=0;i<10;i++){Application.DoEvents();Thread.Sleep(50);}
+    Add("Preview Host renders the file",Capture.Succeeded(record),record?.ToString());
+    using(var shot=new Bitmap(420,620)){using(var g=Graphics.FromImage(shot)){IntPtr dc=g.GetHdc();try{PrintWindow(host.Handle,dc,2);}finally{g.ReleaseHdc(dc);}}shot.Save(Path.ChangeExtension(report,"preview.png"));}
+    Method<Call>(preview,6)(preview);Marshal.Release(init);Marshal.Release(preview);host.Close();
+   }
+  }
+  catch(Exception ex){Add("Native preview activation",false,ex.ToString());}
   File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
  }
 }

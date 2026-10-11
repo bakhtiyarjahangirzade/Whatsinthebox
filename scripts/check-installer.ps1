@@ -47,7 +47,7 @@ function RemoveInstall([string]$name){
  Run $name $uninstaller @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/LOG="'+(Join-Path $evidence ($name+'.log'))+'"'))
  Assert ($name+' uninstall entry removed') (!(Test-Path -LiteralPath $uninstallKey))
  Assert ($name+' prior thumbnail restored') ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq $sentinel)
- Assert ($name+' class removed') (!(Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'))
+ Assert ($name+' class removed') (!(Test-Path 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}'))
  $startup=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  Assert ($name+' startup removed') (!$startup)
  $options=Get-ItemProperty -LiteralPath $optionsKey
@@ -69,15 +69,21 @@ try {
    $options=Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
    Assert 'Windows preview option enabled automatically' ($options.ShowPreviewHandlers -eq 1)
    Assert 'Windows thumbnails enabled automatically' ($options.IconsOnly -eq 0)
+   # Formats Windows renders itself stay with Windows.
    foreach($imageExtension in '.png','.jpg','.jpeg'){
-    $imagePreview='HKCU:\Software\Classes\'+$imageExtension+'\shellex\{8895b1c6-b41f-4c1c-a562-0d564250836f}'
-    $imageHandler=if(Test-Path -LiteralPath $imagePreview){(Get-Item -LiteralPath $imagePreview).GetValue('')}else{$null}
-    Assert ($imageExtension+' application preview registered') ($imageHandler -eq '{EAAC2037-3EB7-4D93-8716-1B6A269C0358}')
+    foreach($interface in '{8895b1c6-b41f-4c1c-a562-0d564250836f}','{e357fccd-a995-4576-b01f-234630154e96}'){
+     $imageKey='HKCU:\Software\Classes\'+$imageExtension+'\shellex\'+$interface
+     $imageHandler=if(Test-Path -LiteralPath $imageKey){(Get-Item -LiteralPath $imageKey).GetValue('')}else{$null}
+     Assert ($imageExtension+' left to Windows '+$interface) ($imageHandler -notin '{BF6AA7C4-61E5-49A2-9F54-BB00C2594CD7}','{62323550-708A-40C9-95A8-0D7056D4F690}')
+    }
    }
+   $psdThumbnail='HKCU:\Software\Classes\.psd\shellex\{e357fccd-a995-4576-b01f-234630154e96}'
+   Assert 'Photoshop thumbnails registered' ((Get-Item -LiteralPath $psdThumbnail).GetValue('') -eq '{62323550-708A-40C9-95A8-0D7056D4F690}')
+   Assert 'no background process at sign-in' (!(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue))
    $before=InstalledExe
    Install 'same-version-repair' $setup
    Assert 'repair uses a fresh binary directory' ((InstalledExe) -ne $before)
-   Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}')
+   Assert 'repair restores integration' (Test-Path 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}')
    $missing=InstalledExe
    Run 'stop-helper-before-file-loss' (Join-Path $env:WINDIR 'System32/WindowsPowerShell/v1.0/powershell.exe') @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',('"'+(Join-Path $root 'installer/StopHelper.ps1')+'"'))
    Move-Item -LiteralPath $missing -Destination ($missing+'.test-backup')
@@ -85,7 +91,7 @@ try {
    finally{Move-Item -LiteralPath ($missing+'.test-backup') -Destination $missing}
    Run 'disable-integration' (InstalledExe) @('--unregister')
    Install 'disabled-repair' $setup 'en' $false
-   Assert 'repair preserves disabled integration' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'))
+   Assert 'repair preserves disabled integration' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}'))
   }
   RemoveInstall ('remove-'+$language)
  }
@@ -101,7 +107,7 @@ try {
  finally{Set-ItemProperty -LiteralPath $uninstallKey -Name DisplayIcon -Value $current}
  Assert 'downgrade leaves current selection unchanged' ((InstalledExe) -eq $current)
  $helpers=@(Get-CimInstance Win32_Process -Filter "Name='Whatsinthebox.exe'" | Where-Object {$_.CommandLine -like '*--windows-host*'})
- Assert 'only one startup helper' ($helpers.Count -le 1)
+ Assert 'no background helper after upgrade' ($helpers.Count -eq 0)
  RemoveInstall 'remove-upgraded-install'
  # Hold the previous native DLL loaded throughout the upgrade, as Explorer does.
  # A new class identity must select the new bridge without unloading this handle.
@@ -114,13 +120,13 @@ try {
   Install 'upgrade-with-previous-bridge-loaded' $setup
   Assert 'previous preview class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{8A04DBB7-7A32-4922-A95A-C33FAC9E733B}'))
   Assert 'previous thumbnail class retired' (!(Test-Path 'HKCU:\Software\Classes\CLSID\{47CCD7B8-35F6-4835-965C-F488331ADE93}'))
-  Assert 'new thumbnail class active' ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq '{916D5157-F38C-4068-A7E9-613E8E6DFD64}')
-  Assert 'native factory avoids inaccessible surrogate' ((Get-Item 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}').GetValue('DisableProcessIsolation') -eq 1)
-  $newBridge=(Get-Item 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}\InprocServer32').GetValue('')
+  Assert 'new thumbnail class active' ((Get-Item -LiteralPath $thumbnailKey).GetValue('') -eq '{62323550-708A-40C9-95A8-0D7056D4F690}')
+  Assert 'thumbnails stay in the Windows isolation surrogate' ($null -eq (Get-Item 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}').GetValue('DisableProcessIsolation'))
+  $newBridge=(Get-Item 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}\InprocServer32').GetValue('')
   Assert 'new bridge path selected' ($newBridge -ne $heldPath -and (Test-Path -LiteralPath $newBridge))
   $fixture=Join-Path $evidence 'migration.pdf'
   Run 'migration fixture' (InstalledExe) @('--write-test-pdf',('"'+$fixture+'"'))
-  [IO.File]::WriteAllText((Join-Path (Split-Path (InstalledExe)) 'test-capture.flag'),$fixture)
+  [IO.File]::WriteAllText((Join-Path (Split-Path (InstalledExe)) 'shell/test-capture.flag'),'isolated runner')
   Run 'native pipeline after held-bridge upgrade' (Join-Path $root 'artifacts/windows-tests/Whatsinthebox.Tests.exe') @(('"'+(Join-Path $evidence 'migration-native.json')+'"'),'--system-host',('"'+$fixture+'"'))
   Assert 'old bridge file preserved while loaded' (Test-Path -LiteralPath $heldPath)
  }finally{if($held -ne [IntPtr]::Zero){[HeldBridge]::FreeLibrary($held) | Out-Null}}

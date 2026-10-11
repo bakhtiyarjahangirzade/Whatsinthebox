@@ -14,7 +14,7 @@ static class ThumbnailRefresh
     [UnmanagedFunctionPointer(CallingConvention.StdCall)] delegate int GetBitmap(IntPtr self, out IntPtr bitmap);
     static T Method<T>(IntPtr obj, int slot) where T:Delegate => Marshal.GetDelegateForFunctionPointer<T>(Marshal.ReadIntPtr(Marshal.ReadIntPtr(obj), slot*IntPtr.Size));
     static readonly Guid CacheClass=new("50ef4544-ac9f-4a8e-b21b-8a26180db13f"), CacheInterface=new("f676c15d-596a-4ce2-8234-33996f445db1"), ItemInterface=new("43826d1e-e718-42ee-bc55-a1e261c37bfe");
-    public static readonly string[] Extensions=SupportedFiles.ImageExtensions.Concat(new[]{".pdf",".ai"}).ToArray();
+    public static readonly string[] Extensions=SupportedFiles.NativeThumbnail;
     public static List<Size> Refresh(string path)
     {
         if(!File.Exists(path)||!Extensions.Contains(Path.GetExtension(path).ToLowerInvariant()))throw new IOException(L.T("format.unsupported"));

@@ -56,8 +56,8 @@ try{
  if($uac -eq 1 -and $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'UAC-enabled desktop test must run without administrator privileges'}
  Run $app @('--register')
  Run $app @('--write-explorer-fixtures',('"'+$fixtures+'"'))
- [IO.File]::WriteAllLines((Join-Path (Split-Path $app) 'test-capture.flag'),[string[]]@(Get-ChildItem -LiteralPath $fixtures -File | ForEach-Object FullName))
+ [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'shell/test-capture.flag'),'isolated runner')
  Run $tests @(('"'+(Join-Path $evidence 'actual-explorer.json')+'"'),'--explorer',('"'+$fixtures+'"')) 780
  $success=$true
 }catch{$errorText=$_.ToString()}
-finally{try{Run $app @('--unregister')}catch{};Remove-Item (Join-Path (Split-Path $app) 'test-capture.flag') -ErrorAction SilentlyContinue;@{success=$success;error=$errorText} | ConvertTo-Json | Set-Content -LiteralPath $authorized.result}
+finally{try{Run $app @('--unregister')}catch{};Remove-Item (Join-Path (Split-Path $app) 'shell/test-capture.flag') -ErrorAction SilentlyContinue;@{success=$success;error=$errorText} | ConvertTo-Json | Set-Content -LiteralPath $authorized.result}

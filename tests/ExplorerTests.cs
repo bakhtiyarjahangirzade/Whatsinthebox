@@ -44,8 +44,10 @@ static class ExplorerTests
         var results=new List<object>();int failed=0;
         void Stage(string value)=>File.AppendAllText(report+".stage",DateTime.UtcNow.ToString("O")+" "+value+Environment.NewLine);
         GetWindowThreadProcessId(GetShellWindow(),out uint shellProcess);
-        string thumbnails=Path.Combine(PreviewStorage.Root,"thumbnail-test.log");if(File.Exists(thumbnails))File.Delete(thumbnails);
-        File.Delete(Path.Combine(PreviewStorage.Root,"handler-trace.log"));
+        try{Directory.Delete(Capture.Folder,true);}catch{}
+        string decisions=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Whatsinthebox","integration.json");
+        using var plan=JsonDocument.Parse(File.ReadAllText(decisions));
+        var ownPreview=plan.RootElement.GetProperty("preview").EnumerateArray().Select(x=>x.GetString()!).ToHashSet(StringComparer.OrdinalIgnoreCase);
         try
         {
             // Documented per-user Explorer state for "Preview pane: on".
@@ -54,7 +56,7 @@ static class ExplorerTests
             foreach(string file in Directory.GetFiles(folder).OrderBy(x=>Path.GetExtension(x) switch{".png"=>0,".jpg"=>1,".jpeg"=>2,_=>3}).ThenBy(x=>x))
             {
                 string ext=Path.GetExtension(file).ToLowerInvariant(),name=Path.GetFileName(file);
-                string state=Path.Combine(PreviewStorage.Root,"embedded-test.json");File.Delete(state);File.Delete(Path.Combine(PreviewStorage.Root,"embedded-test.png"));
+                bool ours=ownPreview.Contains(ext);
                 var before=FolderWindows();
                 Stage("opening Explorer with "+name+" selected");
                 using(System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),"explorer.exe"),"/separate,/select,\""+Path.GetFullPath(file)+"\""){UseShellExecute=false})){}
@@ -65,33 +67,31 @@ static class ExplorerTests
                 ShowWindow(hwnd,9);MoveWindow(hwnd,0,0,1400,900,true);SetForegroundWindow(hwnd);
                 // Explorer only reads the stored pane state for some windows; show it explicitly.
                 Thread.Sleep(1500);SetForegroundWindow(hwnd);SendKeys.SendWait("%p");Stage("pressed Alt+P for "+name);
-                bool rendered=false,toggled=false;string? error=null;string? source=null;until=DateTime.UtcNow.AddSeconds(35);
+                // Large icons, so the folder view itself asks for thumbnails.
+                SendKeys.SendWait("^+2");
+                bool rendered=false,toggled=false;JsonElement? record=null;until=DateTime.UtcNow.AddSeconds(ours?35:8);
                 while(DateTime.UtcNow<until)
                 {
                     Thread.Sleep(200);
-                    if(File.Exists(state))
-                    {
-                        try{using var json=JsonDocument.Parse(File.ReadAllText(state));source=json.RootElement.TryGetProperty("source",out var s)?s.GetString():null;
-                        if(name.Equals(source,StringComparison.OrdinalIgnoreCase)){rendered=json.RootElement.GetProperty("success").GetBoolean();if(!rendered)error=json.RootElement.TryGetProperty("error",out var e)?e.GetString():"failed";break;}}catch(IOException){}catch(JsonException){}
-                    }
-                    if(!toggled&&DateTime.UtcNow>until.AddSeconds(-18)&&!ChildTree(hwnd).Any(x=>!x.Contains(" explorer:"))){SetForegroundWindow(hwnd);SendKeys.SendWait("%p");toggled=true;Stage("no foreign preview window yet, toggled pane again for "+name);}
+                    record=Capture.Read("preview",file);
+                    if(record!=null){rendered=Capture.Succeeded(record);break;}
+                    if(ours&&!toggled&&DateTime.UtcNow>until.AddSeconds(-18)&&!ChildTree(hwnd).Any(x=>x.Contains("WhatsintheboxPreviewWindow"))){SetForegroundWindow(hwnd);SendKeys.SendWait("%p");toggled=true;Stage("no preview window yet, toggled pane again for "+name);}
                 }
                 Thread.Sleep(700);
                 string shot=Path.ChangeExtension(report,ext.TrimStart('.')+"-explorer.png");
                 GetWindowRect(hwnd,out var rect);using(var bitmap=new Bitmap(Math.Max(1,rect.Right-rect.Left),Math.Max(1,rect.Bottom-rect.Top))){using(var graphics=Graphics.FromImage(bitmap)){IntPtr dc=graphics.GetHdc();try{PrintWindow(hwnd,dc,2);}finally{graphics.ReleaseHdc(dc);}}bitmap.Save(shot);}
                 try{using var screen=new Bitmap(Math.Max(1,rect.Right-rect.Left),Math.Max(1,rect.Bottom-rect.Top));using(var graphics=Graphics.FromImage(screen))graphics.CopyFromScreen(rect.Left,rect.Top,0,0,screen.Size);screen.Save(Path.ChangeExtension(report,ext.TrimStart('.')+"-screen.png"));}catch(Exception ex){Stage("screen copy failed "+ex.Message);}
                 var tree=ChildTree(hwnd);var hosts=Processes("prevhost","Whatsinthebox","dllhost");
-                if(rendered)File.Copy(Path.Combine(PreviewStorage.Root,"embedded-test.png"),Path.ChangeExtension(report,ext.TrimStart('.')+"-preview.png"),true);
                 bool separate=windowProcess!=shellProcess;
-                results.Add(new{name="Actual Explorer preview pane renders "+ext,passed=rendered&&separate,windowProcess,shellProcess,separateFromShell=separate,toggledAgain=toggled,source,error,screenshot=Path.GetFileName(shot),processes=hosts,windows=tree});
-                if(!(rendered&&separate))failed++;
+                bool passed=ours?rendered&&separate:record==null;
+                results.Add(new{name=(ours?"Actual Explorer preview pane renders "+ext+" with Whatsinthebox":"Explorer keeps its own preview for "+ext),passed,windowProcess,shellProcess,separateFromShell=separate,toggledAgain=toggled,record=record?.ToString(),screenshot=Path.GetFileName(shot),processes=hosts,windows=tree});
+                if(!passed)failed++;
                 PostMessage(hwnd,0x0010,IntPtr.Zero,IntPtr.Zero);Thread.Sleep(800);
             }
         }
         catch(Exception ex){failed++;results.Add(new{name="Actual Explorer workflow",passed=false,error=ex.ToString()});}
-        // Folder views request thumbnails on their own; record which fixtures Explorer asked us for.
-        string[] requests=File.Exists(thumbnails)?File.ReadAllLines(thumbnails):Array.Empty<string>();
-        string traceFile=Path.Combine(PreviewStorage.Root,"handler-trace.log");string[] trace=File.Exists(traceFile)?File.ReadAllLines(traceFile):Array.Empty<string>();
-        File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results,explorerThumbnailRequests=requests,handlerTrace=trace},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
+        // Folder views request thumbnails on their own; list what Explorer asked us for.
+        string[] requests=Directory.Exists(Capture.Folder)?Directory.GetFiles(Capture.Folder,"thumbnail-*.json").Select(File.ReadAllText).ToArray():Array.Empty<string>();
+        File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results,explorerThumbnailRequests=requests},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
     }
 }

@@ -33,28 +33,26 @@ try {
  }finally{$env:DOTNET_ROOT=$savedRoot;$env:DOTNET_ROOT_X64=$savedX64;$env:DOTNET_MULTILEVEL_LOOKUP=$savedLookup}
  try{RunCheck 'shared-ui' $app @('--self-test',('"'+(Join-Path $evidence 'shared-ui.json')+'"'))}catch{Write-Warning $_}
  RunCheck 'fixture' $app @('--write-test-pdf',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
- Copy-Item (Join-Path $root 'artifacts/app/*') (Join-Path $root 'artifacts/windows-tests') -Recurse -Force
- Copy-Item (Join-Path $root 'artifacts/developer-shell/*') (Join-Path $root 'artifacts/windows-tests/shell') -Recurse -Force
- RunCheck 'direct-com' $tests @(('"'+(Join-Path $evidence 'direct-com.json')+'"'))
  RunCheck 'register' $app @('--register')
  $formats=Join-Path $evidence 'format-fixtures'
  RunCheck 'format-fixtures' $app @('--write-explorer-fixtures',('"'+$formats+'"'))
  try{RunCheck 'association-diagnostics' $app @('--diagnose-associations',('"'+(Join-Path $evidence 'association-diagnostics.json')+'"'))}catch{Write-Warning $_}
- $captureTargets=@((Join-Path $evidence 'fixture.pdf'))+@(Get-ChildItem -LiteralPath $formats -File | ForEach-Object FullName)
- [IO.File]::WriteAllLines((Join-Path (Split-Path $app) 'test-capture.flag'),[string[]]$captureTargets)
+ # The native handlers record their renders only while this flag sits next to them.
+ [IO.File]::WriteAllText((Join-Path (Split-Path $app) 'shell/test-capture.flag'),'isolated runner')
+ Copy-Item -LiteralPath (Join-Path $env:LOCALAPPDATA 'Whatsinthebox/integration.json') -Destination (Join-Path $evidence 'integration.json') -ErrorAction SilentlyContinue
  try{RunCheck 'shell-formats' $tests @(('"'+(Join-Path $evidence 'shell-formats.json')+'"'),'--shell-formats',('"'+$formats+'"')) 240}catch{Write-Warning $_}
  RunCheck 'native-shell' $tests @(('"'+(Join-Path $evidence 'native-shell.json')+'"'),'--system-host',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))
  RunCheck 'refresh-thumbnail' $app @('--refresh-thumbnail',('"'+(Join-Path $evidence 'fixture.pdf')+'"'),('"'+(Join-Path $evidence 'thumbnail-refresh.json')+'"'))
  foreach($iteration in 1..3){RunCheck ('repeat-shell-'+$iteration) $tests @(('"'+(Join-Path $evidence ('repeat-shell-'+$iteration+'.json'))+'"'),'--system-host',('"'+(Join-Path $evidence 'fixture.pdf')+'"'))}
  RunCheck 'unregister' $app @('--unregister')
- $exists=Test-Path -LiteralPath 'HKCU:\Software\Classes\CLSID\{916D5157-F38C-4068-A7E9-613E8E6DFD64}'
+ $exists=Test-Path -LiteralPath 'HKCU:\Software\Classes\CLSID\{62323550-708A-40C9-95A8-0D7056D4F690}'
  $startup=(Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name Whatsinthebox -ErrorAction SilentlyContinue).Whatsinthebox
  $results.Add(@{name='registration-cleanup';passed=!$exists -and !$startup})
  if($exists -or $startup){throw 'Registration cleanup failed'}
  if(@($results | Where-Object {!$_.passed}).Count){throw 'One or more Windows checks failed; see summary.json'}
 }finally {
  # Only the disposable runner's own registrations are restored here.
- Remove-Item (Join-Path (Split-Path $app) 'test-capture.flag') -ErrorAction SilentlyContinue
+ Remove-Item (Join-Path (Split-Path $app) 'shell/test-capture.flag') -ErrorAction SilentlyContinue
  try {if(Test-Path -LiteralPath $app){RunCheck 'final-cleanup' $app @('--unregister')}}
  finally {$results | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $evidence 'summary.json') -Encoding UTF8}
 }

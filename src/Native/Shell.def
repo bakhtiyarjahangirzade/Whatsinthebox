@@ -1,0 +1,4 @@
+LIBRARY Whatsinthebox.Shell
+EXPORTS
+ DllGetClassObject PRIVATE
+ DllCanUnloadNow PRIVATE
