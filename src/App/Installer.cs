@@ -91,6 +91,8 @@ static class Installer
                 using var server=cls.CreateSubKey("InprocServer32");server.SetValue("",native);server.SetValue("ThreadingModel","Apartment");
             }
             using(var list=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\PreviewHandlers"))list.SetValue(IntegrationIds.Preview,"Whatsinthebox");
+            // Listed as approved, for PCs where Explorer only loads approved extensions.
+            using(var approved=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved")){approved.SetValue(IntegrationIds.Preview,"Whatsinthebox preview");approved.SetValue(IntegrationIds.Thumbnail,"Whatsinthebox thumbnails");}
             foreach(var pair in targets){using var key=Registry.CurrentUser.CreateSubKey(pair.Key);key.SetValue("",pair.Value);}
             using(var options=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"))
             {
@@ -174,6 +176,7 @@ static class Installer
             Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\CLSID\{id}",false);
             if(id!=IntegrationIds.LegacyPreview)Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\AppID\{id}",false);
             using var list=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\PreviewHandlers",true);list?.DeleteValue(id,false);
+            using var approved=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved",true);approved?.DeleteValue(id,false);
         }
         Notify();
     }

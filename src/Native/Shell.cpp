@@ -174,7 +174,7 @@ namespace
         std::wstring name;
         HWND parent = nullptr, window = nullptr;
         RECT bounds{};
-        witb::Image image; HRESULT result = S_FALSE; bool decoded = false;
+        witb::Image image; HRESULT result = S_FALSE; bool decoded = false, shown = false; std::wstring decoderName;
         HBITMAP scaled = nullptr; UINT scaledW = 0, scaledH = 0;
         COLORREF background = GetSysColor(COLOR_WINDOW), text = GetSysColor(COLOR_WINDOWTEXT);
         HFONT font = nullptr;
@@ -223,6 +223,13 @@ namespace
             if (!w || !h || !image.width) return;
             witb::Image fitted = witb::Resize(image, w, h);
             scaled = ToBitmap(fitted); scaledW = w; scaledH = h;
+            if (!shown && scaled)
+            {
+                // The pane has a size and the image is on screen: record that once.
+                shown = true;
+                RECT client{}; GetClientRect(window, &client);
+                Record(L"preview", BaseName(name.c_str()), result, decoderName, UINT(client.right), UINT(client.bottom), scaledW, scaledH, nullptr);
+            }
         }
 
         void Paint(HWND hwnd)
@@ -320,11 +327,10 @@ namespace
             }
             if (!decoded)
             {
-                std::wstring decoder;
-                result = witb::Decode(stream, Extension(name.c_str()), PreviewDecodeEdge, PreviewDecodeEdge, image, &decoder);
+                result = witb::Decode(stream, Extension(name.c_str()), PreviewDecodeEdge, PreviewDecodeEdge, image, &decoderName);
                 decoded = true;
                 Rescale();
-                Record(L"preview", BaseName(name.c_str()), result, decoder, UINT(bounds.right - bounds.left), UINT(bounds.bottom - bounds.top), scaledW, scaledH, nullptr);
+                if (FAILED(result)) Record(L"preview", BaseName(name.c_str()), result, decoderName, UINT(bounds.right - bounds.left), UINT(bounds.bottom - bounds.top), 0, 0, nullptr);
             }
             InvalidateRect(window, nullptr, FALSE);
             return S_OK;
@@ -334,7 +340,7 @@ namespace
             if (window) { DestroyWindow(window); window = nullptr; }
             if (scaled) { DeleteObject(scaled); scaled = nullptr; }
             if (stream) { stream->Release(); stream = nullptr; }
-            image = witb::Image(); decoded = false; result = S_FALSE;
+            image = witb::Image(); decoded = false; shown = false; result = S_FALSE;
             return S_OK;
         }
         IFACEMETHODIMP SetFocus() override { if (window) ::SetFocus(window); return S_OK; }

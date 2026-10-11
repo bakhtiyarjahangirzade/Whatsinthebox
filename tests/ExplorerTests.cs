@@ -32,6 +32,18 @@ static class ExplorerTests
         return rows;
     }
     static string[] Processes(params string[] names)=>names.SelectMany(n=>System.Diagnostics.Process.GetProcessesByName(n).Select(p=>{string text=n+":"+p.Id;try{text+=" session="+p.SessionId;}catch{}return text;})).ToArray();
+    [DllImport("shell32.dll",CharSet=CharSet.Unicode)]static extern int SHCreateItemFromParsingName(string path,IntPtr context,in Guid iid,out IntPtr item);
+    [DllImport("gdi32.dll")]static extern bool DeleteObject(IntPtr bitmap);
+    [StructLayout(LayoutKind.Sequential)]struct NativeSize{public int cx,cy;}
+    [UnmanagedFunctionPointer(CallingConvention.StdCall)]delegate int GetImage(IntPtr self,NativeSize size,uint flags,out IntPtr bitmap);
+    static int ShellThumbnail(string file,out int width,out int height)
+    {
+        width=height=0;Guid factoryId=new("bcc18b79-ba16-442f-80c4-8a59c30c463b");
+        int hr=SHCreateItemFromParsingName(file,IntPtr.Zero,in factoryId,out var factory);if(hr<0)return hr;
+        try{var call=Marshal.GetDelegateForFunctionPointer<GetImage>(Marshal.ReadIntPtr(Marshal.ReadIntPtr(factory),3*IntPtr.Size));hr=call(factory,new NativeSize{cx=256,cy=256},0x8,out var bitmap);if(hr==0){using(var image=Image.FromHbitmap(bitmap)){width=image.Width;height=image.Height;}DeleteObject(bitmap);}}
+        finally{Marshal.Release(factory);}
+        return hr;
+    }
     static List<IntPtr> FolderWindows()
     {
         var list=new List<IntPtr>();
@@ -92,6 +104,17 @@ static class ExplorerTests
         catch(Exception ex){failed++;results.Add(new{name="Actual Explorer workflow",passed=false,error=ex.ToString()});}
         // Folder views request thumbnails on their own; list what Explorer asked us for.
         string[] requests=Directory.Exists(Capture.Folder)?Directory.GetFiles(Capture.Folder,"thumbnail-*.json").Select(File.ReadAllText).ToArray():Array.Empty<string>();
-        File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results,explorerThumbnailRequests=requests},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
+        // The same Shell thumbnail pipeline from this process, for comparison with the folder view.
+        var direct=new List<object>();
+        foreach(string file in Directory.GetFiles(folder).Where(x=>ownPreview.Contains(Path.GetExtension(x))))
+        {
+            Capture.Clear("thumbnail",file);
+            int hr=ShellThumbnail(file,out int w,out int h);
+            direct.Add(new{file=Path.GetFileName(file),hresult=$"0x{hr:X8}",width=w,height=h,record=Capture.Read("thumbnail",file)?.ToString()});
+        }
+        string Policy(Microsoft.Win32.RegistryKey hive)=>hive.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer")?.GetValue("EnforceShellExtensionSecurity")?.ToString()??"unset";
+        var surrogates=new List<string>();
+        try{using var searcher=new System.Management.ManagementObjectSearcher("SELECT ProcessId,CommandLine FROM Win32_Process WHERE Name='dllhost.exe' OR Name='prevhost.exe'");foreach(var o in searcher.Get())surrogates.Add(o["ProcessId"]+" "+o["CommandLine"]);}catch(Exception ex){surrogates.Add(ex.Message);}
+        File.WriteAllText(report,JsonSerializer.Serialize(new{failed,results,explorerThumbnailRequests=requests,directShellThumbnails=direct,enforceShellExtensionSecurity=new{machine=Policy(Microsoft.Win32.Registry.LocalMachine),user=Policy(Microsoft.Win32.Registry.CurrentUser)},surrogates},new JsonSerializerOptions{WriteIndented=true}));return failed==0?0:1;
     }
 }
