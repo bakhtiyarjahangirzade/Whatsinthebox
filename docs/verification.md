@@ -1,49 +1,37 @@
-# Release verification — 1.0.1
+# Release verification — 1.1.0 (candidate)
 
-Exact application source: `9b58150`. Installer SHA256: `26b7efbe0f5817350afe194a55e24af9d52122444ff2a84d7b28eed2e181bd22`. The published 74,434,270-byte installer is the successful Windows 2025 artifact, not a later rebuild. It remains unsigned.
+1.1.0 replaces the 1.0 Explorer integration. 1.0 forwarded Explorer's requests from a small native bridge to a background .NET server; on real Explorer the low-integrity Preview Host never reached that server, so the preview pane stayed blank ([trace run](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/38147300391)). 1.1.0 ships `Whatsinthebox.Preview.dll`, a native thumbnail provider and preview handler that Windows loads in its own isolated hosts. Nothing runs in the background or at sign-in.
 
-Both [Windows 2025](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37990214725) and [Windows 2022](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37990217849) passed **73 application/UI checks** and **114 installer assertions**. The checks include native preview/thumbnail calls after upgrading with the old DLL still loaded, common image preview preservation, automatic Windows preference configuration and exact preference restoration on removal.
+Status: candidate. The checks below passed on disposable GitHub Windows machines. No release has been published from this source yet.
 
-Changes include new class identities to avoid stale factories, PNG XML metadata detection, safe handling of legacy SVG DOCTYPE declarations, smaller fit margins and consistent setup version comparison. Common native Windows image previews remain in place. Only the small native thumbnail forwarding factory opts out of the inaccessible system surrogate; decoding and managed UI remain in the separate application. This is not a full OS sandbox.
-
-Installation and repair run one bounded background pass over existing cached thumbnails in Downloads, Desktop and Documents, including up to two subfolder levels. Enumeration is limited to 512 files per root and skips network, offline, cloud recall and reparse entries. It checks a time/cancellation budget and never clears the global cache or removes file security marks. New files use normal Windows thumbnail requests.
-
-Local PDF inputs use seekable reads up to the library's 4 GiB Windows limit. Named local Shell streams avoid copying the entire input. Anonymous streams remain limited to 256 MiB. A synthetic 300 MB PDF regression fixture passes. Rendering child processes have a 768 MiB process-memory cap and are killed when their owning job closes; UI/thumbnail waits retain their time limits.
-
-Windows can block downloaded files before invoking any full preview handler. No global security policy is changed and download marks are not removed automatically. Damaged or protected documents and practical resource limits remain exceptions; rendering success is not a claim that Windows will allow every file into its preview pane. A dedicated interactive Windows 11 desktop regression remains incomplete.
-
-## Previous 1.0.0 evidence
-
-
-The published installer is the exact artifact produced and exercised by the Windows verification workflow. Application source: `6804f3daa67ae2090059b7afb7f07735309dc6e8`. Documentation and website publishing do not change that binary.
-
-| Check | Evidence | Result |
+| Check | Windows Server 2025 | Windows Server 2022 |
 |---|---|---|
-| Build and dependency audit | [Build checks](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37920737180) | Passed; no NuGet advisories reported |
-| Renderer, formats, locales and stable update selection | 60 windowless checks | Passed |
-| UI user flows | 70 combined checks: PDF navigation, failure recovery, rapid selection, consent and actual fit painting | Passed on both environments |
-| Geometry | 17 checks and 1,000 deterministic asymmetric cases | Passed |
-| Native Shell integration | Native bridge activation, file/stream COM initialization, actual Windows thumbnail cache, tiny thumbnails, PDF preview and targeted refresh | Passed |
-| Repeated use | Four native Shell passes per environment | Passed |
-| Installer lifecycle | 77 assertions: five languages, repair, missing executable recovery, disabled integration, upgrade from published 0.6, downgrade refusal and removal | Passed on both environments |
-| Setup interface | Actual completion screenshots in EN/RU/DE/ZH/TR; portrait rail and checked repository option | Passed |
-| Registration restoration | Previous handler restored; owned classes and startup entry removed | Passed |
-| Crash event monitoring | Application/Shell crash events during the installer journeys | None reported |
-| Signing | Authenticode | Not signed; SHA256 supplied with the release |
+| Native engine: every fixture decoded at 256 and 1024 px, aspect kept, box filled | Passed | Passed |
+| **Real File Explorer windows, preview pane**: PSD, SVG, CDR, ORA, TGA, PPM drawn by Whatsinthebox inside Preview Host, fitted to the pane | [Passed](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/38153137293) | [Passed](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/38153793019), PDF as well |
+| Real File Explorer keeps Windows' own preview for PNG, JPEG, BMP, GIF, TIFF, WebP and fonts | Passed | Passed |
+| **Folder view thumbnails** as an ordinary account: Shell folder view in thumbnail mode, each registered format drawn by Whatsinthebox through the Windows thumbnail cache and isolation surrogate | Passed (7 formats) | Passed (7 formats) |
+| Shell association and thumbnail pipeline per format, ordinary account (53 checks) | Passed | Passed |
+| Preview Host activation of the registered class, thumbnails at 256 and 32 px | Passed | Passed |
+| Installer journeys: five languages, repair, missing-file repair, disabled integration, upgrade from published 0.6.0 and from 1.0.0 with the old DLL held loaded, downgrade refusal, removal restoring previous handlers and preferences, no sign-in helper (119 assertions) | Passed | Passed |
+| Application or Shell crash events during installer journeys | None | None |
+| Signing | Not signed | Not signed |
 
-## Reproducible evidence
+Formats are registered only where the PC has no working handler of its own. On Windows Server 2025 the Microsoft Edge PDF previewer was present, so the PDF preview stayed with Edge while PDF thumbnails came from Whatsinthebox.
 
-- [Windows Server 2025 verification](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37920736770)
-- [Windows Server 2022 verification](https://github.com/bakhtiyarjahangirzade/Whatsinthebox/actions/runs/37920740412)
+## How the real Explorer checks run
 
-Both runs used ordinary user accounts in disposable GitHub Windows machines, synthetic files and real Windows COM/thumbnail APIs. Their `windows-lifecycle-evidence` artifacts include reports, application event results and actual UI screenshots. No private user documents or local lab files were uploaded. The downloadable installer is taken from the successful 2025 run, not rebuilt afterward.
+The GitHub Windows desktop belongs to the runner's built-in administrator, whose Explorer runs elevated. Windows ignores per-user extensions in elevated processes, and Explorer opens no windows for a second account on that desktop. The checks therefore run twice on the same desktop:
 
-## Scope and limits
+1. File Explorer windows started with a medium-integrity token derived from that account select each file (`explorer /select`), show the preview pane and capture the screen. The handler writes a small record of what it drew when a test flag file sits next to it.
+2. The ordinary test account hosts the Shell folder view (the same view control File Explorer uses) in thumbnail mode and requires every registered format to be drawn by Whatsinthebox.
 
-These are automated user-flow and developer checks. They are not a human usability study, an exhaustive decoder fuzz campaign or a long-running soak test. A dedicated Windows 11 interactive Start-menu/taskbar regression was not completed; the local VM was unreliable. The earlier workstation incident in `SystemTray.dll` remains an unconfirmed root cause. The 1.0 design keeps the CLR and managed preview work outside Explorer through a small native bridge.
+Server editions share the Windows 11 Explorer, but this is not a test on Windows 10/11 client editions or on real user PCs. Decoders were exercised with 16,500 randomly damaged files without a crash (under Wine); this is not a complete fuzzing campaign.
 
-Windows x64 is the supported application architecture; ARM64 Explorer cannot load the x64 bridge. The installer rejects other architectures and Windows builds older than 14393. Keep the operating system supported and updated; see [Microsoft's runtime support policy](https://github.com/dotnet/core/blob/main/release-notes/10.0/supported-os.md).
+## Limits
 
-Files render locally. Native decoding has size/time limits and runs separately, but this is not a complete operating-system sandbox. Windows may block downloaded PDFs before invoking any preview handler. The per-file permission action defaults to No and requires explicit consent before removing that file's download mark. No global security policy is weakened.
+- Per-user installation: on accounts whose Explorer runs elevated (UAC off, built-in Administrator) Windows does not load per-user extensions.
+- Windows can block downloaded files from the preview pane. The optional per-file action removes a PDF's download mark only after confirmation.
+- Password-protected or damaged files, PSD files saved without a composite image and CDR files without an embedded preview are not shown.
+- The settings application still contains the 1.0 .NET renderer for its own window; Explorer does not load it.
 
-The installer does not close Explorer or restart Windows, and does not bulk-refresh thumbnail caches. A clean advisory scan and passing tests are evidence about this build, not a promise of zero vulnerabilities or universal format compatibility. The installer is unsigned; a checksum identifies the artifact and is not a publisher signature.
+The 1.0.1 report remains in the repository history.
